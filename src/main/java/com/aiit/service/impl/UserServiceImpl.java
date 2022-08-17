@@ -63,6 +63,8 @@ public class UserServiceImpl implements UserService {
                     infoMap.put("roleName",roleName);
                     resList.add(infoMap);
                 }
+                List<Task> tasks = userMapper.getTaskList(userName);
+                dataMap.put("taskList",tasks);
                 dataMap.put("roleList",roleList);
                 dataMap.put("token",token);
                 dataMap.put("roleList",resList);

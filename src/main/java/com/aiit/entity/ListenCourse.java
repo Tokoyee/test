@@ -21,4 +21,6 @@ public class ListenCourse {
     public String courseSlaveId;
     @ApiModelProperty("用户名")
     public String userName;
+    @ApiModelProperty("评价时间")
+    public String dateTime;
 }

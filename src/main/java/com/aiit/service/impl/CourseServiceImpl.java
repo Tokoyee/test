@@ -262,13 +262,18 @@ public class CourseServiceImpl implements CourseService {
     public List<ScoreStandard> getTourStandardList(){
         return courseMapper.getTourStandard();
     }
-    public void addListenCourseInfo(String include,String advice,String courseSlaveId,String userName){
+    public void addListenCourseInfo(String include,String advice,String courseSlaveId,String userName,Task task){
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        String now_datetime = formatter.format(date);
         ListenCourse listenCourse = new ListenCourse();
         listenCourse.setInclude(include);
         listenCourse.setAdvice(advice);
         listenCourse.setCourseSlaveId(courseSlaveId);
         listenCourse.setUserName(userName);
+        listenCourse.setDateTime(now_datetime);
         courseMapper.addListenCourseInfo(listenCourse);
+        userMapper.solveOnceTask(task);
     }
     public void deleteEvaluationStandard(String standardId){
         courseMapper.deleteEvaluationStandard(standardId);
@@ -288,11 +293,25 @@ public class CourseServiceImpl implements CourseService {
     public void updateTourStandard(ScoreStandard scoreStandard){
         courseMapper.updateTourStandard(scoreStandard);
     }
-    public void addEvaluationCourseInfo(EvaluationCourse evaluationCourse){
-        courseMapper.addEvaluationCourseInfo(evaluationCourse);
+    public List<ScoreStandard> getListenStandardList(){
+        return courseMapper.getListenStandard();
     }
-    public void addTourCourseInfo(TourCourse tourCourse){
+    public void deleteListenStandard(String standardId){
+        courseMapper.deleteListenStandard(standardId);
+    }
+    public void addListenStandard(ScoreStandard scoreStandard){
+        courseMapper.addListenStandard(scoreStandard);
+    }
+    public void updateListenStandard(ScoreStandard scoreStandard){
+        courseMapper.updateListenStandard(scoreStandard);
+    }
+    public void addEvaluationCourseInfo(EvaluationCourse evaluationCourse,Task task){
+        courseMapper.addEvaluationCourseInfo(evaluationCourse);
+        userMapper.solveOnceTask(task);
+    }
+    public void addTourCourseInfo(TourCourse tourCourse,Task task){
         courseMapper.addTourCourseInfo(tourCourse);
+        userMapper.solveOnceTask(task);
     }
     public Map<String,Object> getInstituteInfo(String userName,String roleId){
         Map<String,Object> dataMap = new HashMap<String,Object>();

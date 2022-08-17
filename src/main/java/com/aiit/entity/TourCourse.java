@@ -33,4 +33,6 @@ public class TourCourse {
     public String userName;
     @ApiModelProperty("备注")
     public String remark;
+    @ApiModelProperty("评价时间")
+    public String dateTime;
 }

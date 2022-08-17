@@ -40,4 +40,8 @@ public interface UserMapper {
     public List<String> getUserInstituteType(String userName);
     @Select("select userId from user where userName = #{userName}")
     public List<String> getUserId(String userName);
+    @Select("select taskId,taskDescribe,taskStatus,taskNum from task where userName = #{userName}")
+    public List<Task> getTaskList(String userName);
+    @Update("UPDATE task SET taskNum = #{taskNum},taskStatus = #{taskStatus} WHERE userName = #{userName} AND taskDescribe = #{taskDescribe}")
+    public void solveOnceTask(Task task);
 }

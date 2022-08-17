@@ -2,6 +2,7 @@ package com.aiit.controller;
 
 import com.aiit.entity.EvaluationCourse;
 import com.aiit.entity.ScoreStandard;
+import com.aiit.entity.Task;
 import com.aiit.entity.TourCourse;
 import com.aiit.service.CourseService;
 import com.aiit.util.JsonUtil;
@@ -121,6 +122,24 @@ public class CourseController {
             return JsonUtil.token_error(dataMap);
         }
     }
+    @GetMapping("/getListenStandardList")
+    @Cacheable("getListenStandardList")
+    @CrossOrigin
+    @ApiOperation(value = "获取听课指标列表",notes = "获取听课指标列表的信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = "")
+    })
+    public Map<String,Object> getListenStandardList(@RequestParam(value = "token") @ApiParam("token") String token){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            dataMap.put("dataList",courseService.getListenStandardList());
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
     @GetMapping("/addListenCourseInfo")
     @Cacheable("addListenCourseInfo")
     @CrossOrigin
@@ -133,13 +152,26 @@ public class CourseController {
             @ApiImplicitParam(paramType = "query", name = "advice",
                     value = "评价及建议", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = "")
+                    value = "课程子表编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "taskNum",
+                    value = "任务次数", required = true, defaultValue = "")
     })
-    public Map<String,Object> addListenCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "include") @ApiParam("听课内容") String include,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
+    public Map<String,Object> addListenCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "include") @ApiParam("听课内容") String include,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "taskNum") @ApiParam("任务次数") int taskNum){
         Map<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
-            courseService.addListenCourseInfo(include,advice,courseSlaveId,userName);
+            taskNum = taskNum - 1;
+            String taskStatus = "未完成";
+            if (taskNum <= 0){
+                taskNum = 0;
+                taskStatus = "已完成";
+            }
+            Task task = new Task();
+            task.setTaskNum(taskNum);
+            task.setTaskStatus(taskStatus);
+            task.setTaskDescribe("听课");
+            task.setUserName(userName);
+            courseService.addListenCourseInfo(include,advice,courseSlaveId,userName,task);
             dataMap.put("result","添加成功");
             return JsonUtil.success(dataMap);
         }else {
@@ -182,6 +214,27 @@ public class CourseController {
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             courseService.deleteTourStandard(standardId);
+            dataMap.put("result","删除成功");
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
+    @GetMapping("/deleteListenStandard")
+    @Cacheable("deleteListenStandard")
+    @CrossOrigin
+    @ApiOperation(value = "删除听课指标",notes = "删除听课指标列表中的一个")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardId",
+                    value = "听课指标编号", required = true, defaultValue = "")
+    })
+    public Map<String,Object> deleteListenStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("听课指标编号") String standardId){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            courseService.deleteListenStandard(standardId);
             dataMap.put("result","删除成功");
             return JsonUtil.success(dataMap);
         }else {
@@ -252,6 +305,38 @@ public class CourseController {
             return JsonUtil.token_error(dataMap);
         }
     }
+    @GetMapping("/addListenStandard")
+    @Cacheable("addListenStandard")
+    @CrossOrigin
+    @ApiOperation(value = "添加听课指标",notes = "新增一个听课指标")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardType",
+                    value = "听课指标类型", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardInclude",
+                    value = "听课指标内容", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardWeight",
+                    value = "听课指标权重", required = true, defaultValue = "")
+    })
+    public Map<String,Object> addListenStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardType") @ApiParam("听课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("听课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("听课指标权重") String standardWeight){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            List<ScoreStandard> scoreStandardList = courseService.getListenStandardList();
+            Long standardId = Long.parseLong(scoreStandardList.get(scoreStandardList.size()-1).getStandardId()) + 1;
+            ScoreStandard scoreStandard = new ScoreStandard();
+            scoreStandard.setStandardId(standardId.toString());
+            scoreStandard.setStandardType(standardType);
+            scoreStandard.setStandardInclude(standardInclude);
+            scoreStandard.setStandardWeight(Float.parseFloat(standardWeight));
+            courseService.addListenStandard(scoreStandard);
+            dataMap.put("result","添加成功");
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
     @GetMapping("/updateEvaluationStandard")
     @Cacheable("updateEvaluationStandard")
     @CrossOrigin
@@ -316,6 +401,38 @@ public class CourseController {
             return JsonUtil.token_error(dataMap);
         }
     }
+    @GetMapping("/updateListenStandard")
+    @Cacheable("updateListenStandard")
+    @CrossOrigin
+    @ApiOperation(value = "更新听课指标",notes = "更新听课指标的内容")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardId",
+                    value = "听课指标编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardType",
+                    value = "听课指标类型", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardInclude",
+                    value = "听课指标内容", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "standardWeight",
+                    value = "听课指标权重", required = true, defaultValue = "")
+    })
+    public Map<String,Object> updateListenStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("听课指标编号") String standardId,@RequestParam(value = "standardType") @ApiParam("听课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("听课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("听课指标权重") String standardWeight){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            ScoreStandard scoreStandard = new ScoreStandard();
+            scoreStandard.setStandardId(standardId);
+            scoreStandard.setStandardType(standardType);
+            scoreStandard.setStandardInclude(standardInclude);
+            scoreStandard.setStandardWeight(Float.parseFloat(standardWeight));
+            courseService.updateListenStandard(scoreStandard);
+            dataMap.put("result","更新成功");
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
     @GetMapping("/addEvaluationCourseInfo")
     @Cacheable("addEvaluationCourseInfo")
     @CrossOrigin
@@ -336,9 +453,11 @@ public class CourseController {
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
                     value = "课程子表编号", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "remark",
-                    value = "备注", required = true, defaultValue = "")
+                    value = "备注", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "taskNum",
+                    value = "任务次数", required = true, defaultValue = "")
     })
-    public Map<String,Object> addEvaluationCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "effectScore") @ApiParam("教学效果得分") int effectScore,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark){
+    public Map<String,Object> addEvaluationCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "effectScore") @ApiParam("教学效果得分") int effectScore,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark,@RequestParam(value = "taskNum") @ApiParam("任务次数") int taskNum){
         Map<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
@@ -352,7 +471,22 @@ public class CourseController {
             evaluationCourse.setCourseSlaveId(courseSlaveId);
             evaluationCourse.setUserName(userName);
             evaluationCourse.setRemark(remark);
-            courseService.addEvaluationCourseInfo(evaluationCourse);
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date(System.currentTimeMillis());
+            String now_datetime = formatter.format(date);
+            evaluationCourse.setDateTime(now_datetime);
+            taskNum = taskNum - 1;
+            String taskStatus = "未完成";
+            if (taskNum <= 0){
+                taskNum = 0;
+                taskStatus = "已完成";
+            }
+            Task task = new Task();
+            task.setTaskNum(taskNum);
+            task.setTaskDescribe("评课");
+            task.setTaskStatus(taskStatus);
+            task.setUserName(userName);
+            courseService.addEvaluationCourseInfo(evaluationCourse,task);
             dataMap.put("result","添加成功");
             return JsonUtil.success(dataMap);
         }else {
@@ -381,9 +515,11 @@ public class CourseController {
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
                     value = "课程子表编号", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "remark",
-                    value = "备注", required = true, defaultValue = "")
+                    value = "备注", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "taskNum",
+                    value = "任务次数", required = true, defaultValue = ""),
     })
-    public Map<String,Object> addTourCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "attendance") @ApiParam("出勤率") float attendance,@RequestParam(value = "riseRate") @ApiParam("抬头率") float riseRate,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark){
+    public Map<String,Object> addTourCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "attendance") @ApiParam("出勤率") float attendance,@RequestParam(value = "riseRate") @ApiParam("抬头率") float riseRate,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark,@RequestParam(value = "taskNum") @ApiParam("任务次数") int taskNum){
         Map<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
@@ -398,7 +534,22 @@ public class CourseController {
             tourCourse.setCourseSlaveId(courseSlaveId);
             tourCourse.setUserName(userName);
             tourCourse.setRemark(remark);
-            courseService.addTourCourseInfo(tourCourse);
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date(System.currentTimeMillis());
+            String now_datetime = formatter.format(date);
+            tourCourse.setDateTime(now_datetime);
+            taskNum = taskNum - 1;
+            String taskStatus = "未完成";
+            if (taskNum <= 0){
+                taskNum = 0;
+                taskStatus = "已完成";
+            }
+            Task task = new Task();
+            task.setTaskNum(taskNum);
+            task.setTaskStatus(taskStatus);
+            task.setTaskDescribe("巡课");
+            task.setUserName(userName);
+            courseService.addTourCourseInfo(tourCourse,task);
             dataMap.put("result","添加成功");
             return JsonUtil.success(dataMap);
         }else {
