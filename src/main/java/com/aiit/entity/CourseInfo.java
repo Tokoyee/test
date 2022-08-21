@@ -31,4 +31,6 @@ public class CourseInfo {
     public String trueName;
     @ApiModelProperty("所属学院")
     public String instituteName;
+    @ApiModelProperty("是否订阅")
+    public boolean subscription;
 }

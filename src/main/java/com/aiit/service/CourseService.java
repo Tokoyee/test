@@ -10,7 +10,7 @@ public interface CourseService {
     public Map<String,Object> getNowCourse(int pageNum,int pageNo,String userName,String roleId);
     public List<ScoreStandard> getEvaluationStandardList();
     public List<ScoreStandard> getTourStandardList();
-    public void addListenCourseInfo(String include,String advice,String courseSlaveId,String userName,Task task);
+    public void addListenCourseInfo(ListenCourse listenCourse,Task task);
     public void deleteEvaluationStandard(String standardId);
     public void addEvaluationStandard(ScoreStandard scoreStandard);
     public void updateEvaluationStandard(ScoreStandard scoreStandard);
@@ -26,4 +26,10 @@ public interface CourseService {
     public Map<String,Object> getInstituteInfo(String userName,String roleId);
     public Map<String,Object> getTeacherCourseInfo(String userName,String roleId);
     public List<CourseInfo> getCourseInfoWithText(String userName,String searchText,String roleId,int pageNo,int pageNum);
+    public Map<String,Object> getNotStartCourse(String userName,String roleId,int pageNo,int pageNum);
+    public Map<String,Object> searchNotStartCourse(String userName,String searchText,String roleId,int pageNo,int pageNum);
+    public Task getTaskInfo(Task task);
+    public Map<String,Object> getRecord(String userName,String roleId);
+    public boolean findRecord(String userName,String roleId,String courseSlaveId);
+    public DateTime getCourseDateTime(String courseSlaveId);
 }

@@ -1,18 +1,18 @@
 package com.aiit.controller;
 
-import com.aiit.entity.EvaluationCourse;
-import com.aiit.entity.ScoreStandard;
-import com.aiit.entity.Task;
-import com.aiit.entity.TourCourse;
+import com.aiit.entity.*;
 import com.aiit.service.CourseService;
 import com.aiit.util.JsonUtil;
 import com.aiit.util.JwtUtil;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.Cacheable;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -147,31 +147,63 @@ public class CourseController {
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
                     value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "attitudeScore",
+                    value = "教学态度得分", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "includeScore",
+                    value = "教学内容得分", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "methodScore",
+                    value = "教学方法得分", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "effectScore",
+                    value = "教学效果得分", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "include",
                     value = "听课内容", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "advice",
                     value = "评价及建议", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "taskNum",
-                    value = "任务次数", required = true, defaultValue = "")
+                    value = "课程子表编号", required = true, defaultValue = "")
     })
-    public Map<String,Object> addListenCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "include") @ApiParam("听课内容") String include,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "taskNum") @ApiParam("任务次数") int taskNum){
+    public Map<String,Object> addListenCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "effectScore") @ApiParam("教学效果得分") int effectScore,@RequestParam(value = "include") @ApiParam("听课内容") String include,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
         Map<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
+            if (courseService.findRecord(userName,roleId,courseSlaveId)){
+                return JsonUtil.record_error(dataMap);
+            }
+            Task task = new Task();
+            task.setTaskDescribe("听课");
+            task.setUserName(userName);
+            Task taskInfo = courseService.getTaskInfo(task);
+            int taskNum = taskInfo.getTaskNum();
             taskNum = taskNum - 1;
             String taskStatus = "未完成";
             if (taskNum <= 0){
                 taskNum = 0;
                 taskStatus = "已完成";
             }
-            Task task = new Task();
-            task.setTaskNum(taskNum);
             task.setTaskStatus(taskStatus);
-            task.setTaskDescribe("听课");
             task.setUserName(userName);
-            courseService.addListenCourseInfo(include,advice,courseSlaveId,userName,task);
+            ListenCourse listenCourse = new ListenCourse();
+            listenCourse.setAttitudeScore(attitudeScore);
+            listenCourse.setIncludeScore(includeScore);
+            listenCourse.setMethodScore(methodScore);
+            listenCourse.setEffectScore(effectScore);
+            listenCourse.setTotalScore(attitudeScore + includeScore + methodScore + effectScore);
+            listenCourse.setInclude(include);
+            listenCourse.setAdvice(advice);
+            listenCourse.setCourseSlaveId(courseSlaveId);
+            listenCourse.setUserName(userName);
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date(System.currentTimeMillis());
+            String now_datetime = formatter.format(date);
+            listenCourse.setDateTime(now_datetime);
+            listenCourse.setAttitudeScore(attitudeScore);
+            listenCourse.setIncludeScore(includeScore);
+            listenCourse.setMethodScore(methodScore);
+            listenCourse.setEffectScore(effectScore);
+            listenCourse.setTotalScore(attitudeScore+includeScore+methodScore+effectScore);
+            courseService.addListenCourseInfo(listenCourse,task);
             dataMap.put("result","添加成功");
             return JsonUtil.success(dataMap);
         }else {
@@ -440,6 +472,8 @@ public class CourseController {
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
                     value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "attitudeScore",
                     value = "教学态度得分", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "includeScore",
@@ -453,14 +487,15 @@ public class CourseController {
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
                     value = "课程子表编号", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "remark",
-                    value = "备注", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "taskNum",
-                    value = "任务次数", required = true, defaultValue = "")
+                    value = "备注", required = true, defaultValue = "")
     })
-    public Map<String,Object> addEvaluationCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "effectScore") @ApiParam("教学效果得分") int effectScore,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark,@RequestParam(value = "taskNum") @ApiParam("任务次数") int taskNum){
+    public Map<String,Object> addEvaluationCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "effectScore") @ApiParam("教学效果得分") int effectScore,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark){
         Map<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
+            if (courseService.findRecord(userName,roleId,courseSlaveId)){
+                return JsonUtil.record_error(dataMap);
+            }
             EvaluationCourse evaluationCourse = new EvaluationCourse();
             evaluationCourse.setAttitudeScore(attitudeScore);
             evaluationCourse.setIncludeScore(includeScore);
@@ -475,17 +510,18 @@ public class CourseController {
             Date date = new Date(System.currentTimeMillis());
             String now_datetime = formatter.format(date);
             evaluationCourse.setDateTime(now_datetime);
+            Task task = new Task();
+            task.setTaskDescribe("评课");
+            task.setUserName(userName);
+            Task taskInfo = courseService.getTaskInfo(task);
+            int taskNum = taskInfo.getTaskNum();
             taskNum = taskNum - 1;
             String taskStatus = "未完成";
             if (taskNum <= 0){
                 taskNum = 0;
                 taskStatus = "已完成";
             }
-            Task task = new Task();
-            task.setTaskNum(taskNum);
-            task.setTaskDescribe("评课");
             task.setTaskStatus(taskStatus);
-            task.setUserName(userName);
             courseService.addEvaluationCourseInfo(evaluationCourse,task);
             dataMap.put("result","添加成功");
             return JsonUtil.success(dataMap);
@@ -500,12 +536,16 @@ public class CourseController {
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
                     value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "attitudeScore",
                     value = "教学态度得分", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "includeScore",
                     value = "教学内容得分", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "methodScore",
                     value = "教学方法得分", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "effectScore",
+                    value = "教学效果得分", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "attendance",
                     value = "出勤率", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "riseRate",
@@ -515,19 +555,21 @@ public class CourseController {
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
                     value = "课程子表编号", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "remark",
-                    value = "备注", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "taskNum",
-                    value = "任务次数", required = true, defaultValue = ""),
+                    value = "备注", required = true, defaultValue = "")
     })
-    public Map<String,Object> addTourCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "attendance") @ApiParam("出勤率") float attendance,@RequestParam(value = "riseRate") @ApiParam("抬头率") float riseRate,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark,@RequestParam(value = "taskNum") @ApiParam("任务次数") int taskNum){
+    public Map<String,Object> addTourCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "attitudeScore") @ApiParam("教学态度得分") int attitudeScore,@RequestParam(value = "includeScore") @ApiParam("教学内容得分") int includeScore,@RequestParam(value = "methodScore") @ApiParam("教学方法得分") int methodScore,@RequestParam(value = "effectScore") @ApiParam("教学效果得分") int effectScore,@RequestParam(value = "attendance") @ApiParam("出勤率") float attendance,@RequestParam(value = "riseRate") @ApiParam("抬头率") float riseRate,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark){
         Map<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
+            if (courseService.findRecord(userName,roleId,courseSlaveId)){
+                return JsonUtil.record_error(dataMap);
+            }
             TourCourse tourCourse = new TourCourse();
             tourCourse.setAttitudeScore(attitudeScore);
             tourCourse.setIncludeScore(includeScore);
             tourCourse.setMethodScore(methodScore);
-            tourCourse.setTotalScore(attitudeScore+includeScore+methodScore);
+            tourCourse.setEffectScore(effectScore);
+            tourCourse.setTotalScore(attitudeScore+includeScore+methodScore+effectScore);
             tourCourse.setAttendance(attendance);
             tourCourse.setRiseRate(riseRate);
             tourCourse.setAdvice(advice);
@@ -538,17 +580,18 @@ public class CourseController {
             Date date = new Date(System.currentTimeMillis());
             String now_datetime = formatter.format(date);
             tourCourse.setDateTime(now_datetime);
+            Task task = new Task();
+            task.setTaskDescribe("巡课");
+            task.setUserName(userName);
+            Task taskInfo = courseService.getTaskInfo(task);
+            int taskNum = taskInfo.getTaskNum();
             taskNum = taskNum - 1;
             String taskStatus = "未完成";
             if (taskNum <= 0){
                 taskNum = 0;
                 taskStatus = "已完成";
             }
-            Task task = new Task();
-            task.setTaskNum(taskNum);
             task.setTaskStatus(taskStatus);
-            task.setTaskDescribe("巡课");
-            task.setUserName(userName);
             courseService.addTourCourseInfo(tourCourse,task);
             dataMap.put("result","添加成功");
             return JsonUtil.success(dataMap);
@@ -616,6 +659,174 @@ public class CourseController {
             String userName = JwtUtil.verify(token);
             dataMap.put("resList",courseService.getCourseInfoWithText(userName,searchText,roleId,pageNo,pageNum));
             return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
+    @GetMapping("/getNotStartCourse")
+    @Cacheable("getNotStartCourse")
+    @CrossOrigin
+    @ApiOperation(value = "预约课程",notes = "预约功能对应的课程列表数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "pageNo",
+                    value = "页码", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "pageNum",
+                    value = "页数据量", required = true, defaultValue = "")
+    })
+    public Map<String,Object> getNotStartCourse(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "pageNo") @ApiParam("页码") int pageNo,@RequestParam(value = "pageNum") @ApiParam("页数据量") int pageNum){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            return JsonUtil.success(courseService.getNotStartCourse(userName,roleId,pageNo,pageNum));
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
+    @GetMapping("/searchNotStartCourse")
+    @Cacheable("searchNotStartCourse")
+    @CrossOrigin
+    @ApiOperation(value = "搜索预约课程",notes = "根据关键字搜索要预约的课程")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "searchText",
+                    value = "关键字", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "pageNo",
+                    value = "页码", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "pageNum",
+                    value = "页数据量", required = true, defaultValue = "")
+    })
+    public Map<String,Object> searchNotStartCourse(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "searchText") @ApiParam("关键字") String searchText,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "pageNo") @ApiParam("页码") int pageNo,@RequestParam(value = "pageNum") @ApiParam("页数据量") int pageNum){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            dataMap.put("resList",courseService.searchNotStartCourse(userName,searchText,roleId,pageNo,pageNum));
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
+    @ApiOperation(value = "老师角色雷达图",notes = "老师角色雷达图")
+    @GetMapping("/getTeacherRadar")
+    @CrossOrigin
+    public Map<String,Object> getTeacherRadar(){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        List<Object> dataList = new ArrayList<Object>();
+        String[] typeList = new String[]{"睡觉", "吃东西", "玩手机", "站立", "书写", "看黑板","举手"};
+        dataMap.put("categories",typeList);
+        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        int[] numList1 = new int[]{8,3,18,2,17,45,1};
+        infoMap1.put("name","课程");
+        infoMap1.put("data",numList1);
+        dataList.add(infoMap1);
+        Map<String,Object> infoMap2 = new HashMap<String,Object>();
+        int[] numList2 = new int[]{5,2,11,2,22,43,1};
+        infoMap2.put("name","平均");
+        infoMap2.put("data",numList2);
+        dataList.add(infoMap2);
+        dataMap.put("dataList",dataList);
+        return JsonUtil.success(dataMap);
+    }
+    @ApiOperation(value = "老师角色柱状图",notes = "老师角色柱状图")
+    @GetMapping("/getTeacherBar")
+    @CrossOrigin
+    public Map<String,Object> getTeacherBar(){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        List<Object> dataList = new ArrayList<Object>();
+        String[] typeList = new String[]{"09-12", "09-13", "09-14", "09-15", "09-16", "09-19","09-20"};
+        dataMap.put("categories",typeList);
+        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        int[] numList1 = new int[]{98,96,98,94,95,98,92};
+        infoMap1.put("name","课程");
+        infoMap1.put("data",numList1);
+        dataList.add(infoMap1);
+        Map<String,Object> infoMap2 = new HashMap<String,Object>();
+        int[] numList2 = new int[]{99,97,96,98,98,99,96};
+        infoMap2.put("name","平均");
+        infoMap2.put("data",numList2);
+        dataList.add(infoMap2);
+        dataMap.put("dataList",dataList);
+        return JsonUtil.success(dataMap);
+    }
+    @ApiOperation(value = "课程行为雷达图",notes = "课程行为雷达图")
+    @GetMapping("/getCourseRadar")
+    @CrossOrigin
+    public Map<String,Object> getCourseRadar(){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        List<Object> dataList = new ArrayList<Object>();
+        String[] typeList = new String[]{"计算机思维导论(C语言)", "数据结构与算法", "人工智能导论", "数值计算", "计算机网络基础", "数据分析与可视化","大数据技术导论"};
+        dataMap.put("categories",typeList);
+        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        int[] numList1 = new int[]{90,93,88,92,87,81,91};
+        infoMap1.put("name","得分");
+        infoMap1.put("data",numList1);
+        dataList.add(infoMap1);
+        dataMap.put("dataList",dataList);
+        return JsonUtil.success(dataMap);
+    }
+    @ApiOperation(value = "课程行为折线图",notes = "课程行为折线图")
+    @GetMapping("/getCourseLine")
+    @CrossOrigin
+    public Map<String,Object> getCourseLine(){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        List<Object> dataList = new ArrayList<Object>();
+        String[] typeList = new String[]{"09-12", "09-13", "09-14", "09-15", "09-16", "09-19","09-20"};
+        dataMap.put("categories",typeList);
+        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        int[] numList1 = new int[]{95,92,96,91,97,93,96};
+        infoMap1.put("name","计科2104班");
+        infoMap1.put("data",numList1);
+        dataList.add(infoMap1);
+        Map<String,Object> infoMap2 = new HashMap<String,Object>();
+        int[] numList2 = new int[]{94,91,90,93,92,95,96};
+        infoMap2.put("name","大数据2101班");
+        infoMap2.put("data",numList2);
+        dataList.add(infoMap2);
+        Map<String,Object> infoMap3 = new HashMap<String,Object>();
+        int[] numList3 = new int[]{88,85,81,82,87,91,94};
+        infoMap3.put("name","人工智能2102班");
+        infoMap3.put("data",numList3);
+        dataList.add(infoMap3);
+        dataMap.put("dataList",dataList);
+        return JsonUtil.success(dataMap);
+    }
+    @ApiOperation(value = "课程行为柱状图",notes = "课程行为柱状图")
+    @GetMapping("/getCourseBar")
+    @CrossOrigin
+    public Map<String,Object> getCourseBar(){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        List<Object> dataList = new ArrayList<Object>();
+        String[] typeList = new String[]{"09-12", "09-13", "09-14", "09-15", "09-16", "09-19","09-20"};
+        dataMap.put("categories",typeList);
+        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        int[] numList1 = new int[]{90,93,91,92,97,91,94};
+        infoMap1.put("name","出勤率");
+        infoMap1.put("data",numList1);
+        dataList.add(infoMap1);
+        dataMap.put("dataList",dataList);
+        return JsonUtil.success(dataMap);
+    }
+    @GetMapping("/getRecord")
+    @Cacheable("getRecord")
+    @CrossOrigin
+    @ApiOperation(value = "获取记录",notes = "根据角色获取相应的评价记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
+    })
+    public Map<String,Object> getRecord(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            return JsonUtil.success(courseService.getRecord(userName,roleId));
         }else {
             return JsonUtil.token_error(dataMap);
         }

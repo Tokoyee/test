@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @ApiModel("评分标准信息")
 public class ScoreStandard {
     @ApiModelProperty("主键id")
-    public String id;
+    public int id;
     @ApiModelProperty("评价指标编号")
     public String standardId;
     @ApiModelProperty("评价指标类型")

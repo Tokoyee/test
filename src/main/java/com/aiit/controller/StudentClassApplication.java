@@ -9,7 +9,7 @@ import org.springframework.util.DigestUtils;
 
 @MapperScan("com.aiit.mapper")
 @SpringBootApplication
-//@EnableScheduling   // 开启定时功能
+@EnableScheduling   // 开启定时功能
 @ComponentScan("com.aiit")
 public class StudentClassApplication {
     public static void main(String[] args) {

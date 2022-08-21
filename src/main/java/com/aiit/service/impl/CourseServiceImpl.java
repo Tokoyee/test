@@ -262,16 +262,8 @@ public class CourseServiceImpl implements CourseService {
     public List<ScoreStandard> getTourStandardList(){
         return courseMapper.getTourStandard();
     }
-    public void addListenCourseInfo(String include,String advice,String courseSlaveId,String userName,Task task){
-        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date(System.currentTimeMillis());
-        String now_datetime = formatter.format(date);
-        ListenCourse listenCourse = new ListenCourse();
-        listenCourse.setInclude(include);
-        listenCourse.setAdvice(advice);
-        listenCourse.setCourseSlaveId(courseSlaveId);
-        listenCourse.setUserName(userName);
-        listenCourse.setDateTime(now_datetime);
+    public void addListenCourseInfo(ListenCourse listenCourse,Task task){
+
         courseMapper.addListenCourseInfo(listenCourse);
         userMapper.solveOnceTask(task);
     }
@@ -743,5 +735,431 @@ public class CourseServiceImpl implements CourseService {
         }
         List<CourseInfo> dataList = new ArrayList<CourseInfo>();
         return dataList;
+    }
+    public Map<String,Object> getNotStartCourse(String userName,String roleId,int pageNo,int pageNum){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        String trueName = userMapper.getUserTrueName(userName).get(0);
+        String instituteType = userMapper.getUserInstituteType(userName).get(0);
+        List<String> instituteList = instituteMapper.getInstituteList(instituteType);
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        String now_date = formatter.format(date).split(" ")[0];
+        String now_time = formatter.format(date).split(" ")[1];
+        int now_hour = Integer.parseInt(now_time.split(":")[0]);
+        int now_minute = Integer.parseInt(now_time.split(":")[1]);
+        int minutes = now_hour * 60 + now_minute;
+        String res_time = null;
+        if (minutes < 510){  //第一二节未开始
+            res_time = "08:30-10:05";
+        }else if(minutes >= 510 && minutes < 625){//一二开始，第三四节未开始
+            res_time = "10:25-12:00";
+        }else if(minutes >= 625 && minutes < 840){//三四开始，第五六节未开始
+            res_time = "14:00-15:35";
+        }else if(minutes >= 840 && minutes < 955){//五六开始，第七八节未开始
+            res_time = "15:55-17:30";
+        }else if(minutes >= 955 && minutes < 1140){//七八开始，第九十十一节未开始
+            res_time = "19:00-21:25";
+        }
+        List<CourseInfo> dataList = new ArrayList<CourseInfo>();
+        if (res_time != null){
+            CourseInfo courseInfo = new CourseInfo();
+            courseInfo.setDate(now_date);
+            courseInfo.setTime(res_time);
+            List<CourseInfo> todayCourse = courseMapper.getTodayCourse(courseInfo);
+            for (int i = 0;i<todayCourse.size();i++){
+                dataList.add(todayCourse.get(i));
+            }
+        }
+        List<CourseInfo> afterTodayCourse = courseMapper.getAfterTodayCourse(now_date);
+        for (int i = 0;i<afterTodayCourse.size();i++){
+            dataList.add(afterTodayCourse.get(i));
+        }
+        List<CourseInfo> resList = new ArrayList<CourseInfo>();
+        List<CourseInfo> filterList = new ArrayList<CourseInfo>();
+        if (roleId.equals("2022220230001")){//老师
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                for(int j = 0;j<instituteList.size();j++){
+                    if (instituteList.get(j).equals(dataList.get(i).getInstituteName())){
+                        if (!dataList.get(i).getTrueName().equals(trueName)){
+                            filterList.add(dataList.get(i));
+                        }
+                    }
+                }
+
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                CourseInfo ci = filterList.get(i);
+                List<SubscriptionInfo> subscriptionInfos = userMapper.getSubscriptionWithRole(new UserSubscription(userName,"2022220230001"));
+                for(int j = 0;j<subscriptionInfos.size();j++){
+                    if (subscriptionInfos.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230003")){//学校教务管理人员
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                if (!dataList.get(i).getTrueName().equals(trueName)){
+                    filterList.add(dataList.get(i));
+                }
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                CourseInfo ci = filterList.get(i);
+                List<SubscriptionInfo> subscriptionInfos = userMapper.getSubscriptionWithRole(new UserSubscription(userName,"2022220230003"));
+                for(int j = 0;j<subscriptionInfos.size();j++){
+                    if (subscriptionInfos.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230004")){//学院教务管理人员
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                for(int j = 0;j<instituteList.size();j++){
+                    if (instituteList.get(j).equals(dataList.get(i).getInstituteName())){
+                        if (!dataList.get(i).getTrueName().equals(trueName)){
+                            filterList.add(dataList.get(i));
+                        }
+                    }
+                }
+
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                CourseInfo ci = filterList.get(i);
+                List<SubscriptionInfo> subscriptionInfos = userMapper.getSubscriptionWithRole(new UserSubscription(userName,"2022220230004"));
+                for(int j = 0;j<subscriptionInfos.size();j++){
+                    if (subscriptionInfos.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230005")){//学校督导
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                if (!dataList.get(i).getTrueName().equals(trueName)){
+                    filterList.add(dataList.get(i));
+                }
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                CourseInfo ci = filterList.get(i);
+                List<SubscriptionInfo> subscriptionInfos = userMapper.getSubscriptionWithRole(new UserSubscription(userName,"2022220230005"));
+                for(int j = 0;j<subscriptionInfos.size();j++){
+                    if (subscriptionInfos.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230006")){//学院督导
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                for(int j = 0;j<instituteList.size();j++){
+                    if (instituteList.get(j).equals(dataList.get(i).getInstituteName())){
+                        if (!dataList.get(i).getTrueName().equals(trueName)){
+                            filterList.add(dataList.get(i));
+                        }
+                    }
+                }
+
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                CourseInfo ci = filterList.get(i);
+                List<SubscriptionInfo> subscriptionInfos = userMapper.getSubscriptionWithRole(new UserSubscription(userName,"2022220230006"));
+                for(int j = 0;j<subscriptionInfos.size();j++){
+                    if (subscriptionInfos.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230007")){//辅导员
+            return dataMap;
+        }
+        return dataMap;
+    }
+    public Map<String,Object> searchNotStartCourse(String userName,String searchText,String roleId,int pageNo,int pageNum){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        String trueName = userMapper.getUserTrueName(userName).get(0);
+        String instituteType = userMapper.getUserInstituteType(userName).get(0);
+        List<String> instituteList = instituteMapper.getInstituteList(instituteType);
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        String now_date = formatter.format(date).split(" ")[0];
+        String now_time = formatter.format(date).split(" ")[1];
+        int now_hour = Integer.parseInt(now_time.split(":")[0]);
+        int now_minute = Integer.parseInt(now_time.split(":")[1]);
+        int minutes = now_hour * 60 + now_minute;
+        String res_time = null;
+        if (minutes < 510){  //第一二节未开始
+            res_time = "08:30-10:05";
+        }else if(minutes >= 510 && minutes < 625){//一二开始，第三四节未开始
+            res_time = "10:25-12:00";
+        }else if(minutes >= 625 && minutes < 840){//三四开始，第五六节未开始
+            res_time = "14:00-15:35";
+        }else if(minutes >= 840 && minutes < 955){//五六开始，第七八节未开始
+            res_time = "15:55-17:30";
+        }else if(minutes >= 955 && minutes < 1140){//七八开始，第九十十一节未开始
+            res_time = "19:00-21:25";
+        }
+        List<CourseInfo> dataList = new ArrayList<CourseInfo>();
+        SearchCourse searchCourse = new SearchCourse();
+        searchCourse.setDate(now_date);
+        searchCourse.setSearchText(searchText);
+        if (res_time != null){
+            searchCourse.setTime(res_time);
+            List<CourseInfo> todayCourse = courseMapper.searchTodayCourse(searchCourse);
+            for (int i = 0;i<todayCourse.size();i++){
+                dataList.add(todayCourse.get(i));
+            }
+        }
+        List<CourseInfo> afterTodayCourse = courseMapper.searchAfterTodayCourse(searchCourse);
+        for (int i = 0;i<afterTodayCourse.size();i++){
+            dataList.add(afterTodayCourse.get(i));
+        }
+        List<CourseInfo> resList = new ArrayList<CourseInfo>();
+        List<CourseInfo> filterList = new ArrayList<CourseInfo>();
+        if (roleId.equals("2022220230001")){//老师
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                for(int j = 0;j<instituteList.size();j++){
+                    if (instituteList.get(j).equals(dataList.get(i).getInstituteName())){
+                        if (!dataList.get(i).getTrueName().equals(trueName)){
+                            filterList.add(dataList.get(i));
+                        }
+                    }
+                }
+
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                resList.add(filterList.get(i));
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230003")){//学校教务管理人员
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                if (!dataList.get(i).getTrueName().equals(trueName)){
+                    filterList.add(dataList.get(i));
+                }
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                resList.add(filterList.get(i));
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230004")){//学院教务管理人员
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                for(int j = 0;j<instituteList.size();j++){
+                    if (instituteList.get(j).equals(dataList.get(i).getInstituteName())){
+                        if (!dataList.get(i).getTrueName().equals(trueName)){
+                            filterList.add(dataList.get(i));
+                        }
+                    }
+                }
+
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                resList.add(filterList.get(i));
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230005")){//学校督导
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                if (!dataList.get(i).getTrueName().equals(trueName)){
+                    filterList.add(dataList.get(i));
+                }
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                resList.add(filterList.get(i));
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230006")){//学院督导
+            if (dataList.size() == 0){
+                dataMap.put("data","本学期所有课程均已结束");
+                return JsonUtil.success(dataMap);
+            }
+            if (((pageNo-1) * pageNum) >= dataList.size()){
+                dataMap.put("data",dataList);
+                return JsonUtil.success(dataMap);
+            }
+            for(int i = 0;i<dataList.size();i++){
+                for(int j = 0;j<instituteList.size();j++){
+                    if (instituteList.get(j).equals(dataList.get(i).getInstituteName())){
+                        if (!dataList.get(i).getTrueName().equals(trueName)){
+                            filterList.add(dataList.get(i));
+                        }
+                    }
+                }
+
+            }
+            for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
+                if (i == filterList.size()){
+                    break;
+                }
+                //过滤掉老师所带课程,以及其他学院的课程
+                resList.add(filterList.get(i));
+            }
+            dataMap.put("result",resList);
+            return dataMap;
+        }else if (roleId.equals("2022220230007")){//辅导员
+            return dataMap;
+        }
+        return dataMap;
+    }
+    public Task getTaskInfo(Task task){
+        return userMapper.getTaskInfo(task);
+    }
+
+    public Map<String,Object> getRecord(String userName,String roleId){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        List<Record> dataList = new ArrayList<Record>();
+        List<Record> records = null;
+        if (roleId.equals("2022220230001")){
+            records = courseMapper.getListenRecord(userName);
+        }else if (roleId.equals("2022220230003") || roleId.equals("2022220230004")){
+            records = courseMapper.getTourRecord(userName);
+        }else if (roleId.equals("2022220230005") || roleId.equals("2022220230006")){
+            records = courseMapper.getEvaluationRecord(userName);
+        }
+        for(int i = 0;i<records.size();i++){
+            dataList.add(records.get(i));
+        }
+        dataMap.put("result",dataList);
+        return dataMap;
+    }
+    public boolean findRecord(String userName,String roleId,String courseSlaveId){
+        List<Record> records = null;
+        if (roleId.equals("2022220230001")){
+            records = courseMapper.getListenRecord(userName);
+        }else if (roleId.equals("2022220230003") || roleId.equals("2022220230004")){
+            records = courseMapper.getTourRecord(userName);
+        }else if (roleId.equals("2022220230005") || roleId.equals("2022220230006")){
+            records = courseMapper.getEvaluationRecord(userName);
+        }
+        for(int i = 0;i<records.size();i++){
+            if (records.get(i).getCourseSlaveId().equals(courseSlaveId)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public DateTime getCourseDateTime(String courseSlaveId){
+        return courseMapper.getCourseDateTime(courseSlaveId);
     }
 }

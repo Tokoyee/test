@@ -48,11 +48,27 @@ public interface CourseMapper {
     @Insert("insert into evaluation_course(`attitudeScore`,`includeScore`,`methodScore`,`effectScore`,`totalScore`,`advice`,`courseSlaveId`,`userName`,`dateTime`) values(#{attitudeScore},#{includeScore},#{methodScore},#{effectScore},#{totalScore},#{advice},#{courseSlaveId},#{userName},#{dateTime})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addEvaluationCourseInfo(EvaluationCourse evaluationCourse);
-    @Insert("insert into tour_course(`attitudeScore`,`includeScore`,`methodScore`,`totalScore`,`attendance`,`riseRate`,`advice`,`courseSlaveId`,`userName`,`dateTime`) values(#{attitudeScore},#{includeScore},#{methodScore},#{totalScore},#{attendance},#{riseRate},#{advice},#{courseSlaveId},#{userName},#{dateTime})")
+    @Insert("insert into tour_course(`attitudeScore`,`includeScore`,`methodScore`,`effectScore`,`totalScore`,`attendance`,`riseRate`,`advice`,`courseSlaveId`,`userName`,`dateTime`) values(#{attitudeScore},#{includeScore},#{methodScore},#{effectScore},#{totalScore},#{attendance},#{riseRate},#{advice},#{courseSlaveId},#{userName},#{dateTime})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addTourCourseInfo(TourCourse tourCourse);
     @Select("SELECT cs.week,cs.weeks,cs.periodTime,cs.time,dw.date,cm.courseName,cm.classroomId,u.trueName,u.instituteName FROM course_slave cs,date_week dw,course_master cm,user u WHERE date = '2022-11-01' AND time = '08:30-10:05' AND cs.week = dw.week AND cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId AND (cm.courseName LIKE concat('%',#{searchText},'%') or u.trueName LIKE concat('%',#{searchText},'%') or u.instituteName LIKE concat('%',#{searchText},'%'))")
     public List<CourseInfo> getCourseInfoWithText(String searchText);
     @Select("SELECT DISTINCT u.trueName FROM course_slave cs,date_week dw,course_master cm,user u WHERE DATE = '2022-11-01' AND TIME = '08:30-10:05' AND cs.week = dw.week AND cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId")
     public List<String> getAllTeacher();
+    @Select("SELECT cs.week,cs.weeks,cs.periodTime,cs.courseSlaveId,cs.time,dw.date,cm.courseName,cm.classroomId,u.trueName,u.instituteName FROM course_slave cs,date_week dw,course_master cm,user u WHERE cs.week = dw.week AND DATE > '2022-11-01' AND cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId ORDER BY date")
+    public List<CourseInfo> getAfterTodayCourse(String date);
+    @Select("SELECT cs.week,cs.weeks,cs.periodTime,cs.courseSlaveId,cs.time,dw.date,cm.courseName,cm.classroomId,u.trueName,u.instituteName FROM course_slave cs,date_week dw,course_master cm,user u WHERE cs.week = dw.week AND DATE = '2022-11-01' AND time >= #{time} and cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId ORDER BY time")
+    public List<CourseInfo> getTodayCourse(CourseInfo courseInfo);
+    @Select("SELECT cs.week,cs.weeks,cs.periodTime,cs.courseSlaveId,cs.time,dw.date,cm.courseName,cm.classroomId,u.trueName,u.instituteName FROM course_slave cs,date_week dw,course_master cm,user u WHERE cs.week = dw.week AND DATE > '2022-11-01' AND cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId and (cm.courseName LIKE concat('%',#{searchText},'%') or u.trueName LIKE concat('%',#{searchText},'%') or u.instituteName LIKE concat('%',#{searchText},'%')) ORDER BY date")
+    public List<CourseInfo> searchAfterTodayCourse(SearchCourse searchCourse);
+    @Select("SELECT cs.week,cs.weeks,cs.periodTime,cs.courseSlaveId,cs.time,dw.date,cm.courseName,cm.classroomId,u.trueName,u.instituteName FROM course_slave cs,date_week dw,course_master cm,user u WHERE cs.week = dw.week AND DATE = '2022-11-01' AND time >= #{time} and cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId and (cm.courseName LIKE concat('%',#{searchText},'%') or u.trueName LIKE concat('%',#{searchText},'%') or u.instituteName LIKE concat('%',#{searchText},'%')) ORDER BY time")
+    public List<CourseInfo> searchTodayCourse(SearchCourse searchCourse);
+    @Select("SELECT cs.courseSlaveId,cm.courseName,u.trueName,classroomId,className,periodTime,time,DATETIME,WEEK,weeks,section FROM evaluation_course ec,course_slave cs,course_master cm,user u WHERE cs.courseMasterId = cm.courseMasterId AND cs.courseSlaveId = ec.courseSlaveId AND u.userId = cm.userId AND ec.userName = #{userName}")
+    public List<Record> getEvaluationRecord(String userName);
+    @Select("SELECT cs.courseSlaveId,cm.courseName,u.trueName,classroomId,className,periodTime,TIME,DATETIME,WEEK,weeks,section FROM tour_course tc,course_slave cs,course_master cm,user u WHERE cs.courseMasterId = cm.courseMasterId AND cs.courseSlaveId = tc.courseSlaveId AND u.userId = cm.userId AND tc.userName = #{userName}")
+    public List<Record> getTourRecord(String userName);
+    @Select("SELECT cs.courseSlaveId,cm.courseName,u.trueName,classroomId,className,periodTime,TIME,DATETIME,WEEK,weeks,section FROM listen_course lc,course_slave cs,course_master cm,user u WHERE cs.courseMasterId = cm.courseMasterId AND cs.courseSlaveId = lc.courseSlaveId AND u.userId = cm.userId AND lc.userName = #{userName}")
+    public List<Record> getListenRecord(String userName);
+    @Select("SELECT dw.date,cs.time FROM date_week dw,course_slave cs WHERE dw.week = cs.week AND dw.weeks = cs.weeks AND courseSlaveId = #{courseSlaveId}")
+    public DateTime getCourseDateTime(String courseSlaveId);
 }

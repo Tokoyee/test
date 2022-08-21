@@ -33,4 +33,11 @@ public class JsonUtil {
         res.put("data", data);     //数据
         return res;
     }
+    public static HashMap<String, Object> record_error(Map<String, Object> data) {
+        HashMap<String, Object> res = new HashMap<>();
+        res.put("code", HttpServletResponse.SC_BAD_REQUEST);     //响应码
+        res.put("msg", "禁止重复评价!");        //备注消息
+        res.put("data", data);     //数据
+        return res;
+    }
 }

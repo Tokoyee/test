@@ -1,10 +1,10 @@
 package com.aiit.controller;
 
-import com.aiit.entity.Message;
-import com.aiit.entity.User;
-import com.aiit.entity.UserInfo;
+import com.aiit.entity.*;
+import com.aiit.service.CourseService;
 import com.aiit.service.UserService;
 import com.aiit.util.JsonUtil;
+import com.aiit.util.JwtUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.*;
@@ -23,7 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.Cacheable;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -34,6 +37,8 @@ import java.util.Map;
 public class UserController {
     @Autowired
     UserService userService;
+    @Autowired
+    CourseService courseService;
     @GetMapping("/getUserInfo")
     @Cacheable("getUserInfo")
     @CrossOrigin
@@ -150,77 +155,70 @@ public class UserController {
         return JsonUtil.success(dataMap);
     }
     /*
-    订阅消息
+    添加订阅
      */
-    @GetMapping("/sendMessage")
+    @PostMapping("/addSubscription")
     @CrossOrigin
     @ApiOperation(value = "订阅消息",notes = "订阅消息->消息推送")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "touser",
                     value = "openid", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "date1",
-                    value = "日期", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "thing4",
-                    value = "节次", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "thing6",
-                    value = "课程名称", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "thing13",
-                    value = "授课老师", required = true, defaultValue = ""),
-            @ApiImplicitParam(paramType = "query", name = "thing17",
-                    value = "班级", required = true, defaultValue = "")
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
+                    value = "课程子表编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = "")
     })
-    public HashMap<String,Object> getAccessToken(@RequestParam(value = "touser") @ApiParam("openid") String touser,@RequestParam(value = "date1") @ApiParam("日期") String date1  ,@RequestParam(value = "thing4") @ApiParam("节次") String thing4,@RequestParam(value = "thing6") @ApiParam("课程名称") String thing6,@RequestParam(value = "thing13") @ApiParam("授课教师") String thing13,@RequestParam(value = "thing17") @ApiParam("班级") String thing17){
+    public HashMap<String,Object> addSubscription(@RequestParam(value = "touser") @ApiParam("openid") String touser,@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId){
         HashMap<String,Object> dataMap = new HashMap<String,Object>();
-        String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxd6a69cf9d408a010&secret=2ace9c7abb9119357fb54b2cc60d4c91";
-        // 请求头设置,x-www-form-urlencoded格式的数据
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        //第一次请求，获取accessToken
-        //提交参数设置
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        // 组装请求体
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
-        RestTemplate restTemplate = new RestTemplate();
-        // 发送post请求，并打印结果，以String类型接收响应结果JSON字符串
-        String result = restTemplate.postForObject(url, request, String.class);
-        JSONObject dataInfo = JSON.parseObject(result);
-        String access_token = dataInfo.getString("access_token");
-
-        //第二次请求订阅消息
-        String url2 = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token="+access_token;
-        //提交参数设置
-        Message message = new Message();
-        message.setTouser(touser);
-        message.setTemplate_id("ybmmiRLNhvrJNZm0oEsjgI7CT4YEI1dqXbT5PGsIr2U");
-        message.setPage("pages/class/classDetail");
-        message.setMiniprogram_state("trial");
-        message.setLang("zh_CN");
-        HashMap<String,Object> paramData = new HashMap<String,Object>();
-        HashMap<String,String> date1Map = new HashMap<String,String>();
-        HashMap<String,String> thing4Map = new HashMap<String,String>();
-        HashMap<String,String> thing6Map = new HashMap<String,String>();
-        HashMap<String,String> thing13Map = new HashMap<String,String>();
-        HashMap<String,String> thing17Map = new HashMap<String,String>();
-        date1Map.put("value",date1);
-        thing4Map.put("value",thing4);
-        thing6Map.put("value",thing6);
-        thing13Map.put("value",thing13);
-        thing17Map.put("value",thing17);
-        paramData.put("date1",date1Map);
-        paramData.put("thing4",thing4Map);
-        paramData.put("thing6",thing6Map);
-        paramData.put("thing13",thing13Map);
-        paramData.put("thing17",thing17Map);
-        message.setData(paramData);
-        log.info(String.valueOf(message));
-        // 组装请求体
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url2,message,String.class);
-        log.info(responseEntity.getBody());
-        JSONObject resultMsg = JSON.parseObject(responseEntity.getBody());
-        String errmsg = resultMsg.getString("errmsg");
-        String errcode = resultMsg.getString("errcode");
-        dataMap.put("errmsg",errmsg);
-        dataMap.put("errcode",errcode);
-        return dataMap;
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            Subscription subscription = new Subscription();
+            subscription.setUserName(userName);
+            subscription.setRoleId(roleId);
+            subscription.setTouser(touser);
+            subscription.setCourseSlaveId(courseSlaveId);
+            DateTime dateTime = courseService.getCourseDateTime(courseSlaveId);
+            String remindDate = dateTime.getDate();
+            int remindTime = Integer.parseInt(dateTime.getTime().split("-")[0].split(":")[0]) * 60 + Integer.parseInt(dateTime.getTime().split("-")[0].split(":")[1]) - 30;  //提前半小时
+            subscription.setRemindDate(remindDate);
+            subscription.setRemindTime(remindTime);
+            List<Subscription> subscriptions = userService.getAllSubscription();
+            String subscriptionId = "";
+            if (subscriptions.size() != 0){
+                Long id = Long.parseLong(subscriptions.get(subscriptions.size()-1).getSubscriptionId()) + 1;
+                subscriptionId = id.toString();
+            }else {
+                subscriptionId = "2022220230001";
+            }
+            subscription.setSubscriptionId(subscriptionId);
+            userService.addSubscription(subscription);
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
+    /*
+    取消订阅
+     */
+    @PostMapping("/deleteSubscription")
+    @CrossOrigin
+    @ApiOperation(value = "取消订阅",notes = "取消订阅")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "subscriptionId",
+                    value = "订阅编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+    })
+    public HashMap<String,Object> deleteSubscription(@RequestParam(value = "subscriptionId") @ApiParam("订阅编号") String subscriptionId,@RequestParam(value = "token") @ApiParam("token") String token){
+        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            userService.deleteSubscription(subscriptionId);
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
     }
 }

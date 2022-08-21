@@ -21,4 +21,6 @@ public class Task {
     public int taskNum;
     @ApiModelProperty("用户名")
     public String userName;
+    @ApiModelProperty("任务完成次数")
+    public int solveTaskNum;
 }

@@ -7,15 +7,26 @@ import com.aiit.mapper.UserMapper;
 import com.aiit.service.UserService;
 import com.aiit.util.JsonUtil;
 import com.aiit.util.JwtUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -24,6 +35,8 @@ public class UserServiceImpl implements UserService {
     CourseMapper classroomMapper;
     @Autowired
     RoleMapper roleMapper;
+    @Autowired
+    CourseMapper courseMapper;
     /*
     获取用户信息
      */
@@ -124,5 +137,80 @@ public class UserServiceImpl implements UserService {
         userMapper.addUserRole(userRole);
         userMapper.addAuthor(author);
         userMapper.addRoleAuthor(roleAuthor);
+    }
+    public void sendMassage(String touser,String subscriptionId){
+        String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxd6a69cf9d408a010&secret=2ace9c7abb9119357fb54b2cc60d4c91";
+        // 请求头设置,x-www-form-urlencoded格式的数据
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        //第一次请求，获取accessToken
+        //提交参数设置
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        // 组装请求体
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        // 发送post请求，并打印结果，以String类型接收响应结果JSON字符串
+        String result = restTemplate.postForObject(url, request, String.class);
+        JSONObject dataInfo = JSON.parseObject(result);
+        String access_token = dataInfo.getString("access_token");
+
+        //第二次请求订阅消息
+        String url2 = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token="+access_token;
+        //提交参数设置
+        Message message = new Message();
+        message.setTouser(touser);
+        message.setTemplate_id("ybmmiRLNhvrJNZm0oEsjgI7CT4YEI1dqXbT5PGsIr2U");
+        message.setPage("pages/class/classDetail");
+        message.setMiniprogram_state("trial");
+        message.setLang("zh_CN");
+        HashMap<String,Object> paramData = new HashMap<String,Object>();
+        HashMap<String,String> date1Map = new HashMap<String,String>();
+        HashMap<String,String> thing4Map = new HashMap<String,String>();
+        HashMap<String,String> thing6Map = new HashMap<String,String>();
+        HashMap<String,String> thing13Map = new HashMap<String,String>();
+        HashMap<String,String> thing17Map = new HashMap<String,String>();
+        SubscriptionInfo subscriptionInfo = userMapper.getSubscriptionInfo(subscriptionId);
+        String date1 = subscriptionInfo.getDate() + " " + subscriptionInfo.getTime();
+        String thing4 = subscriptionInfo.getSection();
+        String thing6 = subscriptionInfo.getCourseName();
+        String thing13 = subscriptionInfo.getTrueName();
+        String thing17 = subscriptionInfo.getClassName();
+        date1Map.put("value",date1);
+        thing4Map.put("value",thing4);
+        thing6Map.put("value",thing6);
+        thing13Map.put("value",thing13);
+        thing17Map.put("value",thing17);
+        paramData.put("date1",date1Map);
+        paramData.put("thing4",thing4Map);
+        paramData.put("thing6",thing6Map);
+        paramData.put("thing13",thing13Map);
+        paramData.put("thing17",thing17Map);
+        message.setData(paramData);
+        log.info(String.valueOf(message));
+        // 组装请求体
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url2,message,String.class);
+        log.info(responseEntity.getBody());
+//        JSONObject resultMsg = JSON.parseObject(responseEntity.getBody());
+    }
+    public Map<String,Object> getSubscriptionCourse(){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+
+        return dataMap;
+    }
+    public Map<String,Object> addSubscription(Subscription subscription){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        userMapper.addSubscription(subscription);
+        return dataMap;
+    }
+    public Map<String,Object> deleteSubscription(String subscriptionId){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        userMapper.deleteSubscription(subscriptionId);
+        return dataMap;
+    }
+    public List<Subscription> getAllSubscription(){
+        return userMapper.getAllSubscription();
+    }
+    public List<Subscription> getTodaySubscription(String remindDate){
+        return userMapper.getTodaySubscription(remindDate);
     }
 }
