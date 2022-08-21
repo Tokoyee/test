@@ -157,7 +157,7 @@ public class UserController {
     /*
     添加订阅
      */
-    @PostMapping("/addSubscription")
+    @GetMapping("/addSubscription")
     @CrossOrigin
     @ApiOperation(value = "订阅消息",notes = "订阅消息->消息推送")
     @ApiImplicitParams({
@@ -202,7 +202,7 @@ public class UserController {
     /*
     取消订阅
      */
-    @PostMapping("/deleteSubscription")
+    @GetMapping("/deleteSubscription")
     @CrossOrigin
     @ApiOperation(value = "取消订阅",notes = "取消订阅")
     @ApiImplicitParams({
