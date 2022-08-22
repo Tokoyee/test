@@ -202,9 +202,9 @@ public class UserServiceImpl implements UserService {
         userMapper.addSubscription(subscription);
         return dataMap;
     }
-    public Map<String,Object> deleteSubscription(String subscriptionId){
+    public Map<String,Object> deleteSubscription(RoleSubscription roleSubscription){
         Map<String,Object> dataMap = new HashMap<String,Object>();
-        userMapper.deleteSubscription(subscriptionId);
+        userMapper.deleteSubscription(roleSubscription);
         return dataMap;
     }
     public List<Subscription> getAllSubscription(){
@@ -212,5 +212,15 @@ public class UserServiceImpl implements UserService {
     }
     public List<Subscription> getTodaySubscription(String remindDate){
         return userMapper.getTodaySubscription(remindDate);
+    }
+    public List<SubscriptionInfo> getSubscriptionWithRole(UserSubscription userSubscription){
+        List<SubscriptionInfo> resultList = new ArrayList<SubscriptionInfo>();
+        List<SubscriptionInfo> dataList = userMapper.getSubscriptionWithRole(userSubscription);
+        for(int i = 0;i<dataList.size();i++){
+            SubscriptionInfo subscriptionInfo = dataList.get(i);
+            subscriptionInfo.setSubscription(true);
+            resultList.add(subscriptionInfo);
+        }
+        return resultList;
     }
 }

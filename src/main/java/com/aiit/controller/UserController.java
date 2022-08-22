@@ -193,6 +193,7 @@ public class UserController {
                 subscriptionId = "2022220230001";
             }
             subscription.setSubscriptionId(subscriptionId);
+            dataMap.put("subscriptionId",subscriptionId);
             userService.addSubscription(subscription);
             return JsonUtil.success(dataMap);
         }else {
@@ -206,16 +207,40 @@ public class UserController {
     @CrossOrigin
     @ApiOperation(value = "取消订阅",notes = "取消订阅")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "query", name = "subscriptionId",
-                    value = "订阅编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
             @ApiImplicitParam(paramType = "query", name = "token",
                     value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
+                    value = "课程子表编号", required = true, defaultValue = "")
     })
-    public HashMap<String,Object> deleteSubscription(@RequestParam(value = "subscriptionId") @ApiParam("订阅编号") String subscriptionId,@RequestParam(value = "token") @ApiParam("token") String token){
+    public HashMap<String,Object> deleteSubscription(@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
         HashMap<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
-            userService.deleteSubscription(subscriptionId);
+            userService.deleteSubscription(new RoleSubscription(roleId,userName,courseSlaveId));
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
+    /*
+    获取订阅列表
+     */
+    @GetMapping("/getSubscriptionList")
+    @CrossOrigin
+    @ApiOperation(value = "获取订阅列表",notes = "获取订阅列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = "")
+    })
+    public HashMap<String,Object> getSubscriptionList(@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "token") @ApiParam("token") String token){
+        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            dataMap.put("dataList",userService.getSubscriptionWithRole(new UserSubscription(userName,roleId)));
             return JsonUtil.success(dataMap);
         }else {
             return JsonUtil.token_error(dataMap);

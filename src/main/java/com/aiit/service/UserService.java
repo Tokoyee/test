@@ -1,8 +1,6 @@
 package com.aiit.service;
 
-import com.aiit.entity.Subscription;
-import com.aiit.entity.User;
-import com.aiit.entity.UserInfo;
+import com.aiit.entity.*;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,8 @@ public interface UserService {
     public void sendMassage(String touser,String subscriptionId);
     public Map<String,Object> getSubscriptionCourse();
     public Map<String,Object> addSubscription(Subscription subscription);
-    public Map<String,Object> deleteSubscription(String subscriptionId);
+    public Map<String,Object> deleteSubscription(RoleSubscription roleSubscription);
     public List<Subscription> getAllSubscription();
     public List<Subscription> getTodaySubscription(String remindDate);
+    public List<SubscriptionInfo> getSubscriptionWithRole(UserSubscription userSubscription);
 }

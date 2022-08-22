@@ -25,4 +25,6 @@ public class SubscriptionInfo {
     public String date;
     @ApiModelProperty("课程子表编号")
     public String courseSlaveId;
+    @ApiModelProperty("课程子表编号")
+    public boolean subscription;
 }

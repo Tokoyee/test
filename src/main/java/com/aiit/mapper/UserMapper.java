@@ -46,11 +46,11 @@ public interface UserMapper {
     public void solveOnceTask(Task task);
     @Select("select * from task where taskDescribe = #{taskDescribe} and userName = #{userName}")
     public Task getTaskInfo(Task task);
-    @Insert("insert into subscription(`subscriptionId`,`touser`,`courseSlaveId`,`userName`,`roleId`,`remindDate`,`remindTime`) values(#{subscriptionId},#{touser},#{courseSlaveId},#{userName},#{roleId},#{remindDate},#{remindTime}})")
+    @Insert("insert into subscription(`subscriptionId`,`touser`,`courseSlaveId`,`userName`,`roleId`,`remindDate`,`remindTime`) values(#{subscriptionId},#{touser},#{courseSlaveId},#{userName},#{roleId},#{remindDate},#{remindTime})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addSubscription(Subscription subscription);
-    @Delete("delete from subscription where subscriptionId = #{subscriptionId}}")
-    public void deleteSubscription(String subscriptionId);
+    @Delete("delete from subscription where userName = #{userName} and roleId = #{roleId} and courseSlaveId = #{courseSlaveId}")
+    public void deleteSubscription(RoleSubscription roleSubscription);
     @Select("select * from subscription where remindDate = #{remindDate}")
     public List<Subscription> getTodaySubscription(String remindDate);
     @Select("select * from subscription")
