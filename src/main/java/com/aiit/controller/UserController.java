@@ -246,4 +246,37 @@ public class UserController {
             return JsonUtil.token_error(dataMap);
         }
     }
+    /*
+   获取订阅列表
+    */
+    @GetMapping("/roleTaskInfo")
+    @CrossOrigin
+    @ApiOperation(value = "获取角色任务",notes = "获取角色的任务信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "roleId",
+                    value = "角色编号", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = "")
+    })
+    public HashMap<String,Object> roleTaskInfo(@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "token") @ApiParam("token") String token){
+        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            String taskDescribe = "";
+            if (roleId.equals("2022220230001")){
+                taskDescribe = "听课";
+            }else if(roleId.equals("2022220230003") || roleId.equals("2022220230004")){
+                taskDescribe = "巡课";
+            }else if(roleId.equals("2022220230005") || roleId.equals("2022220230006")){
+                taskDescribe = "评课";
+            }
+            Task task = new Task();
+            task.setUserName(userName);
+            task.setTaskDescribe(taskDescribe);
+            dataMap.put("result",userService.roleTaskInfo(task));
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
 }

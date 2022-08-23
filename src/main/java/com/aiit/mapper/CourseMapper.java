@@ -42,13 +42,13 @@ public interface CourseMapper {
     public void addListenStandard(ScoreStandard scoreStandard);
     @Update("update listen_course_standard set standardType = #{standardType},standardInclude = #{standardInclude},standardWeight = #{standardWeight} where standardId = #{standardId}")
     public void updateListenStandard(ScoreStandard scoreStandard);
-    @Insert("insert into listen_course(`include`,`advice`,`courseSlaveId`,`userName`,`dateTime`) values(#{include},#{advice},#{courseSlaveId},#{userName},#{dateTime})")
+    @Insert("insert into listen_course(`q1`,`q2`,`q3`,`q4`,`include`,`advice`,`courseSlaveId`,`userName`,`dateTime`,`roleId`) values(#{q1},#{q2},#{q3},#{q4},#{include},#{advice},#{courseSlaveId},#{userName},#{dateTime},#{roleId})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addListenCourseInfo(ListenCourse listenCourse);
-    @Insert("insert into evaluation_course(`attitudeScore`,`includeScore`,`methodScore`,`effectScore`,`totalScore`,`advice`,`courseSlaveId`,`userName`,`dateTime`) values(#{attitudeScore},#{includeScore},#{methodScore},#{effectScore},#{totalScore},#{advice},#{courseSlaveId},#{userName},#{dateTime})")
+    @Insert("insert into evaluation_course(`q1`,`q2`,`q3`,`q4`,`q5`,`q6`,`q7`,`q8`,`q9`,`q10`,`q11`,`q12`,`q13`,`advice`,`courseSlaveId`,`userName`,`dateTime`,`roleId`,`remark`) values(#{q1},#{q2},#{q3},#{q4},#{q5},#{q6},#{q7},#{q8},#{q9},#{q10},#{q11},#{q12},#{q13},#{advice},#{courseSlaveId},#{userName},#{dateTime},#{roleId},#{remark})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addEvaluationCourseInfo(EvaluationCourse evaluationCourse);
-    @Insert("insert into tour_course(`attitudeScore`,`includeScore`,`methodScore`,`effectScore`,`totalScore`,`attendance`,`riseRate`,`advice`,`courseSlaveId`,`userName`,`dateTime`) values(#{attitudeScore},#{includeScore},#{methodScore},#{effectScore},#{totalScore},#{attendance},#{riseRate},#{advice},#{courseSlaveId},#{userName},#{dateTime})")
+    @Insert("insert into tour_course(`q1`,`q2`,`q3`,`q4`,`q5`,`attendance`,`riseRate`,`advice`,`courseSlaveId`,`userName`,`dateTime`,`roleId`,`remark`) values(#{q1},#{q2},#{q3},#{q4},#{q5},#{attendance},#{riseRate},#{advice},#{courseSlaveId},#{userName},#{dateTime},#{roleId},#{remark})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addTourCourseInfo(TourCourse tourCourse);
     @Select("SELECT cs.week,cs.weeks,cs.periodTime,cs.time,dw.date,cm.courseName,cm.classroomId,u.trueName,u.instituteName FROM course_slave cs,date_week dw,course_master cm,user u WHERE date = '2022-11-01' AND time = '08:30-10:05' AND cs.week = dw.week AND cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId AND (cm.courseName LIKE concat('%',#{searchText},'%') or u.trueName LIKE concat('%',#{searchText},'%') or u.instituteName LIKE concat('%',#{searchText},'%'))")
@@ -71,4 +71,16 @@ public interface CourseMapper {
     public List<Record> getListenRecord(String userName);
     @Select("SELECT dw.date,cs.time FROM date_week dw,course_slave cs WHERE dw.week = cs.week AND dw.weeks = cs.weeks AND courseSlaveId = #{courseSlaveId}")
     public DateTime getCourseDateTime(String courseSlaveId);
+    @Select("select * from listen_course where userName = #{userName} and roleId = #{roleId} and courseSlaveId = #{courseSlaveId}")
+    public ListenCourse getListenCourseInfo(ListenCourse listenCourse);
+    @Select("select * from listen_course where userName = #{userName} and roleId = #{roleId}")
+    public List<ListenCourse> getListenCourseList(ListenCourse listenCourse);
+    @Select("select * from tour_course where userName = #{userName} and roleId = #{roleId} and courseSlaveId = #{courseSlaveId}")
+    public TourCourse getTourCourseInfo(TourCourse tourCourse);
+    @Select("select * from tour_course where userName = #{userName} and roleId = #{roleId}")
+    public List<TourCourse> getTourCourseList(TourCourse tourCourse);
+    @Select("select * from evaluation_course where userName = #{userName} and roleId = #{roleId} and courseSlaveId = #{courseSlaveId}")
+    public EvaluationCourse getEvaluationCourseInfo(EvaluationCourse evaluationCourse);
+    @Select("select * from evaluation_course where userName = #{userName} and roleId = #{roleId}")
+    public List<EvaluationCourse> getEvaluationCourseList(EvaluationCourse evaluationCourse);
 }

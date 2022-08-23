@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
         Message message = new Message();
         message.setTouser(touser);
         message.setTemplate_id("ybmmiRLNhvrJNZm0oEsjgI7CT4YEI1dqXbT5PGsIr2U");
-        message.setPage("pages/class/classDetail");
+        message.setPage("pages/login/login");
         message.setMiniprogram_state("trial");
         message.setLang("zh_CN");
         HashMap<String,Object> paramData = new HashMap<String,Object>();
@@ -222,5 +222,8 @@ public class UserServiceImpl implements UserService {
             resultList.add(subscriptionInfo);
         }
         return resultList;
+    }
+    public Task roleTaskInfo(Task task){
+        return userMapper.getTaskInfo(task);
     }
 }

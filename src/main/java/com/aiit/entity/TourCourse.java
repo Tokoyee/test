@@ -13,16 +13,16 @@ import lombok.NoArgsConstructor;
 public class TourCourse {
     @ApiModelProperty("主键id")
     public int id;
-    @ApiModelProperty("教学态度得分")
-    public int attitudeScore;
-    @ApiModelProperty("教学内容得分")
-    public int includeScore;
-    @ApiModelProperty("教学方法得分")
-    public int methodScore;
-    @ApiModelProperty("教学效果得分")
-    public int effectScore;
-    @ApiModelProperty("总得分")
-    public int totalScore;
+    @ApiModelProperty("问题1答案")
+    public String q1;
+    @ApiModelProperty("问题2答案")
+    public String q2;
+    @ApiModelProperty("问题3答案")
+    public String q3;
+    @ApiModelProperty("问题4答案")
+    public String q4;
+    @ApiModelProperty("问题5答案")
+    public String q5;
     @ApiModelProperty("出勤率")
     public float attendance;
     @ApiModelProperty("抬头率")
@@ -33,6 +33,8 @@ public class TourCourse {
     public String courseSlaveId;
     @ApiModelProperty("用户名")
     public String userName;
+    @ApiModelProperty("角色编号")
+    public String roleId;
     @ApiModelProperty("备注")
     public String remark;
     @ApiModelProperty("评价时间")

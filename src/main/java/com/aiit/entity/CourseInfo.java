@@ -33,4 +33,8 @@ public class CourseInfo {
     public String instituteName;
     @ApiModelProperty("是否订阅")
     public boolean subscription;
+    @ApiModelProperty("课程图片")
+    public String courseImg;
+    @ApiModelProperty("是否评价")
+    public boolean evaluation;
 }

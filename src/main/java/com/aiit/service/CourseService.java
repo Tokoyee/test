@@ -32,4 +32,8 @@ public interface CourseService {
     public Map<String,Object> getRecord(String userName,String roleId);
     public boolean findRecord(String userName,String roleId,String courseSlaveId);
     public DateTime getCourseDateTime(String courseSlaveId);
+    public ListenCourse getListenCourseInfo(ListenCourse listenCourse);
+    public TourCourse getTourCourseInfo(TourCourse tourCourse);
+    public EvaluationCourse getEvaluationCourseInfo(EvaluationCourse evaluationCourse);
+
 }

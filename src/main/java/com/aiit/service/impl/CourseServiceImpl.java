@@ -40,7 +40,6 @@ public class CourseServiceImpl implements CourseService {
         }
         dataMap.put("data_list",data_list);
         dataMap.put("result_list",result_list);
-
         return JsonUtil.success(dataMap);
     }
     public Map<String,Object> getNowCourse(int pageNum,int pageNo,String userName,String roleId){
@@ -72,15 +71,18 @@ public class CourseServiceImpl implements CourseService {
                         }
                     }
                 }
-
             }
+            String[] imgList = new String[]{"http://aiitbeidou.cn:8080/courseImg/img1.png","http://aiitbeidou.cn:8080/courseImg/img2.png","http://aiitbeidou.cn:8080/courseImg/img3.png","http://aiitbeidou.cn:8080/courseImg/img4.png","http://aiitbeidou.cn:8080/courseImg/img5.png"};
             for(int i = ((pageNo - 1) * pageNum);i<pageNum*pageNo;i++){
                 if (i == dataList.size()){
                     break;
                 }
                 //过滤掉老师所带课程,以及其他学院的课程
-                resList.add(dataList.get(i));
+                CourseInfo ci = dataList.get(i);
+                ci.setCourseImg(imgList[new Random().nextInt(5)]);
+                resList.add(ci);
             }
+
             dataMap.put("data",resList);
         }else if (roleId.equals("2022220230003")){//学校教务管理人员
             CourseInfo courseInfo = new CourseInfo();
@@ -263,8 +265,7 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.getTourStandard();
     }
     public void addListenCourseInfo(ListenCourse listenCourse,Task task){
-
-        courseMapper.addListenCourseInfo(listenCourse);
+//        courseMapper.addListenCourseInfo(listenCourse);
         userMapper.solveOnceTask(task);
     }
     public void deleteEvaluationStandard(String standardId){
@@ -1161,5 +1162,14 @@ public class CourseServiceImpl implements CourseService {
     }
     public DateTime getCourseDateTime(String courseSlaveId){
         return courseMapper.getCourseDateTime(courseSlaveId);
+    }
+    public ListenCourse getListenCourseInfo(ListenCourse listenCourse){
+        return courseMapper.getListenCourseInfo(listenCourse);
+    }
+    public TourCourse getTourCourseInfo(TourCourse tourCourse){
+        return courseMapper.getTourCourseInfo(tourCourse);
+    }
+    public EvaluationCourse getEvaluationCourseInfo(EvaluationCourse evaluationCourse){
+        return courseMapper.getEvaluationCourseInfo(evaluationCourse);
     }
 }

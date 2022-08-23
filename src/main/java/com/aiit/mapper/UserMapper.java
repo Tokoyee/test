@@ -42,7 +42,7 @@ public interface UserMapper {
     public List<String> getUserId(String userName);
     @Select("select * from task where userName = #{userName}")
     public List<Task> getTaskList(String userName);
-    @Update("UPDATE task SET taskNum = (taskNum - 1),taskStatus = #{taskStatus},solveTaskNum = (solveTaskNum + 1) WHERE userName = #{userName} AND taskDescribe = #{taskDescribe}")
+    @Update("UPDATE task SET taskNum = #{taskNum},taskStatus = #{taskStatus},solveTaskNum = (solveTaskNum + 1) WHERE userName = #{userName} AND taskDescribe = #{taskDescribe}")
     public void solveOnceTask(Task task);
     @Select("select * from task where taskDescribe = #{taskDescribe} and userName = #{userName}")
     public Task getTaskInfo(Task task);

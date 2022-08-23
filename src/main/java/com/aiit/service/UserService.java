@@ -18,4 +18,5 @@ public interface UserService {
     public List<Subscription> getAllSubscription();
     public List<Subscription> getTodaySubscription(String remindDate);
     public List<SubscriptionInfo> getSubscriptionWithRole(UserSubscription userSubscription);
+    public Task roleTaskInfo(Task task);
 }
