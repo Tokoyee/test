@@ -9,6 +9,7 @@ import com.aiit.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.lang.model.element.ElementVisitor;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -80,9 +81,14 @@ public class CourseServiceImpl implements CourseService {
                 //过滤掉老师所带课程,以及其他学院的课程
                 CourseInfo ci = dataList.get(i);
                 ci.setCourseImg(imgList[new Random().nextInt(5)]);
+                List<ListenCourse> courseList = courseMapper.getRoleSubscriptionListenCourse(new UserSubscription(userName,roleId));
+                for (int j = 0;j<courseList.size();j++){
+                    if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
                 resList.add(ci);
             }
-
             dataMap.put("data",resList);
         }else if (roleId.equals("2022220230003")){//学校教务管理人员
             CourseInfo courseInfo = new CourseInfo();
@@ -110,7 +116,14 @@ public class CourseServiceImpl implements CourseService {
                     break;
                 }
                 //过滤掉老师所带课程
-                resList.add(dataList.get(i));
+                CourseInfo ci = dataList.get(i);
+                List<TourCourse> courseList = courseMapper.getRoleSubscriptionTourCourse(new UserSubscription(userName,roleId));
+                for (int j = 0;j<courseList.size();j++){
+                    if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
             }
             dataMap.put("data",resList);
         }else if (roleId.equals("2022220230004")){//学院教务管理人员
@@ -143,7 +156,14 @@ public class CourseServiceImpl implements CourseService {
                     break;
                 }
                 //过滤掉老师所带课程,以及其他学院的课程
-                resList.add(dataList.get(i));
+                CourseInfo ci = dataList.get(i);
+                List<TourCourse> courseList = courseMapper.getRoleSubscriptionTourCourse(new UserSubscription(userName,roleId));
+                for (int j = 0;j<courseList.size();j++){
+                    if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
             }
             dataMap.put("data",resList);
         }else if (roleId.equals("2022220230005")){//学校督导
@@ -172,7 +192,14 @@ public class CourseServiceImpl implements CourseService {
                     break;
                 }
                 //过滤掉老师所带课程
-                resList.add(dataList.get(i));
+                CourseInfo ci = dataList.get(i);
+                List<EvaluationCourse> courseList = courseMapper.getRoleSubscriptionEvaluationCourse(new UserSubscription(userName,roleId));
+                for (int j = 0;j<courseList.size();j++){
+                    if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
             }
             dataMap.put("data",resList);
         }else if (roleId.equals("2022220230006")){//学院督导
@@ -206,7 +233,14 @@ public class CourseServiceImpl implements CourseService {
                     break;
                 }
                 //过滤掉老师所带课程,以及其他学院的课程
-                resList.add(dataList.get(i));
+                CourseInfo ci = dataList.get(i);
+                List<EvaluationCourse> courseList = courseMapper.getRoleSubscriptionEvaluationCourse(new UserSubscription(userName,roleId));
+                for (int j = 0;j<courseList.size();j++){
+                    if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
+                        ci.setSubscription(true);
+                    }
+                }
+                resList.add(ci);
             }
             dataMap.put("data",resList);
         }else if (roleId.equals("2022220230007")){//辅导员
@@ -1130,35 +1164,33 @@ public class CourseServiceImpl implements CourseService {
     public Map<String,Object> getRecord(String userName,String roleId){
         Map<String,Object> dataMap = new HashMap<String,Object>();
         List<Record> dataList = new ArrayList<Record>();
-        List<Record> records = null;
         if (roleId.equals("2022220230001")){
-            records = courseMapper.getListenRecord(userName);
+            List<ListenCourse> courseList = courseMapper.getRoleSubscriptionListenCourse(new UserSubscription(userName,roleId));
+            for(int i = 0;i<courseList.size();i++){
+                Record record = courseMapper.getRecord(courseList.get(i).getCourseSlaveId());
+                record.setDateTime(courseList.get(i).getDateTime());
+                record.setCourseSlaveId(courseList.get(i).getCourseSlaveId());
+                dataList.add(record);
+            }
         }else if (roleId.equals("2022220230003") || roleId.equals("2022220230004")){
-            records = courseMapper.getTourRecord(userName);
+            List<TourCourse> courseList = courseMapper.getRoleSubscriptionTourCourse(new UserSubscription(userName,roleId));
+            for(int i = 0;i<courseList.size();i++){
+                Record record = courseMapper.getRecord(courseList.get(i).getCourseSlaveId());
+                record.setDateTime(courseList.get(i).getDateTime());
+                record.setCourseSlaveId(courseList.get(i).getCourseSlaveId());
+                dataList.add(record);
+            }
         }else if (roleId.equals("2022220230005") || roleId.equals("2022220230006")){
-            records = courseMapper.getEvaluationRecord(userName);
-        }
-        for(int i = 0;i<records.size();i++){
-            dataList.add(records.get(i));
+            List<EvaluationCourse> courseList = courseMapper.getRoleSubscriptionEvaluationCourse(new UserSubscription(userName,roleId));
+            for(int i = 0;i<courseList.size();i++){
+                Record record = courseMapper.getRecord(courseList.get(i).getCourseSlaveId());
+                record.setDateTime(courseList.get(i).getDateTime());
+                record.setCourseSlaveId(courseList.get(i).getCourseSlaveId());
+                dataList.add(record);
+            }
         }
         dataMap.put("result",dataList);
         return dataMap;
-    }
-    public boolean findRecord(String userName,String roleId,String courseSlaveId){
-        List<Record> records = null;
-        if (roleId.equals("2022220230001")){
-            records = courseMapper.getListenRecord(userName);
-        }else if (roleId.equals("2022220230003") || roleId.equals("2022220230004")){
-            records = courseMapper.getTourRecord(userName);
-        }else if (roleId.equals("2022220230005") || roleId.equals("2022220230006")){
-            records = courseMapper.getEvaluationRecord(userName);
-        }
-        for(int i = 0;i<records.size();i++){
-            if (records.get(i).getCourseSlaveId().equals(courseSlaveId)){
-                return true;
-            }
-        }
-        return false;
     }
     public DateTime getCourseDateTime(String courseSlaveId){
         return courseMapper.getCourseDateTime(courseSlaveId);

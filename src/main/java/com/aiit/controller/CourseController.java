@@ -552,9 +552,6 @@ public class CourseController {
         Map<String,Object> dataMap = new HashMap<String,Object>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
-            if (courseService.findRecord(userName,roleId,courseSlaveId)){
-                return JsonUtil.record_error(dataMap);
-            }
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date(System.currentTimeMillis());
             String now_datetime = formatter.format(date);
