@@ -9,7 +9,7 @@ public interface UserService {
     public User getUser(String userName);
     public Map<String,Object> getUserInfo(String userName,String password);
     public void updateTrueName(User user);
-    public void updateImgName(User user);
+    public void updateUserImg(User user);
     public void addUser(UserInfo userInfo);
     public void sendMassage(String touser,String subscriptionId);
     public Map<String,Object> getSubscriptionCourse();

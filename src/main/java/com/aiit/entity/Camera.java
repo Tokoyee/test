@@ -14,7 +14,7 @@ public class Camera {
     @ApiModelProperty("主键id")
     public int id;
     @ApiModelProperty("摄像头id")
-    public int cameraId;
+    public String cameraId;
     @ApiModelProperty("摄像头视频流")
-    public int cameraUrl;
+    public String cameraUrl;
 }

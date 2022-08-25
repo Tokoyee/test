@@ -15,8 +15,8 @@ public interface UserMapper {
     public List<User> getAllUser();
     @Update("update user set trueName = #{trueName} where userName = #{userName}")
     public void updateTrueName(User user);
-    @Update("update user set imgName = #{imgName} where userName = #{userName}")
-    public void updateImgName(User user);
+    @Update("update user set imgUrl = #{imgUrl} where userName = #{userName}")
+    public void updateImgUrl(User user);
     @Update("update user set phoneNumber = #{phoneNumber} where userName = #{userName}")
     public void updatePhoneNumber(User user);
     @Insert("insert into user(`userId`,`userName`,`trueName`,`password`,`imgUrl`) values(#{userId},#{userName},#{trueName},#{password},#{imgName})")
