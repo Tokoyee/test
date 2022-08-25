@@ -33,10 +33,10 @@ public class CourseController {
     @CrossOrigin
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = "")
+                    value = "token", required = true)
     })
     public Map<String,Object> getInstitudeTeacher(@RequestParam(value = "token") @ApiParam("token") String token){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             return courseService.getTeacherList();
@@ -53,16 +53,16 @@ public class CourseController {
     @ApiOperation(value = "获取当前课程信息",notes = "获取当前正在上课的课程信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNum",
-                    value = "页数据量", required = true, defaultValue = ""),
+                    value = "页数据量", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNo",
-                    value = "页码", required = true, defaultValue = ""),
+                    value = "页码", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = "")
+                    value = "角色编号", required = true)
     })
     public Map<String,Object> getNowCourse(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "pageNum") @ApiParam("页数据量") int pageNum,@RequestParam(value = "pageNo") @ApiParam("页码") int pageNo,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             return courseService.getNowCourse(pageNum,pageNo,userName,roleId);
@@ -76,10 +76,10 @@ public class CourseController {
     @ApiOperation(value = "获取评课指标列表",notes = "获取评课指标列表的信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = "")
+                    value = "token", required = true)
     })
     public Map<String,Object> getEvaluationStandardList(@RequestParam(value = "token") @ApiParam("token") String token){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             dataMap.put("dataList",courseService.getEvaluationStandardList());
@@ -94,10 +94,10 @@ public class CourseController {
     @ApiOperation(value = "获取巡课指标列表",notes = "获取巡课指标列表的信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = "")
+                    value = "token", required = true)
     })
     public Map<String,Object> getTourStandardList(@RequestParam(value = "token") @ApiParam("token") String token){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             dataMap.put("dataList",courseService.getTourStandardList());
@@ -112,10 +112,10 @@ public class CourseController {
     @ApiOperation(value = "获取听课指标列表",notes = "获取听课指标列表的信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = "")
+                    value = "token", required = true)
     })
     public Map<String,Object> getListenStandardList(@RequestParam(value = "token") @ApiParam("token") String token){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             dataMap.put("dataList",courseService.getListenStandardList());
@@ -130,26 +130,26 @@ public class CourseController {
     @ApiOperation(value = "添加听课记录",notes = "教师听课后的信息录入")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "q1",
-                    value = "问题1答案", required = true, defaultValue = ""),
+                    value = "问题1答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q2",
-                    value = "问题2答案", required = true, defaultValue = ""),
+                    value = "问题2答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q3",
-                    value = "问题3答案", required = true, defaultValue = ""),
+                    value = "问题3答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q4",
-                    value = "问题4答案", required = true, defaultValue = ""),
+                    value = "问题4答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "include",
-                    value = "听课内容", required = true, defaultValue = ""),
+                    value = "听课内容", required = true),
             @ApiImplicitParam(paramType = "query", name = "advice",
-                    value = "评价及建议", required = true, defaultValue = ""),
+                    value = "评价及建议", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = "")
+                    value = "课程子表编号", required = true)
     })
     public Map<String,Object> addListenCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "q1") @ApiParam("问题1答案") String q1,@RequestParam(value = "q2") @ApiParam("问题2答案") String q2,@RequestParam(value = "q3") @ApiParam("问题3答案") String q3,@RequestParam(value = "q4") @ApiParam("问题4答案") String q4,@RequestParam(value = "include") @ApiParam("听课内容") String include,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             Task task = new Task();
@@ -183,12 +183,12 @@ public class CourseController {
     @ApiOperation(value = "删除评课指标",notes = "删除评课指标列表中的一个")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardId",
-                    value = "评课指标编号", required = true, defaultValue = "")
+                    value = "评课指标编号", required = true)
     })
     public Map<String,Object> deleteEvaluationStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("评课指标编号") String standardId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             courseService.deleteEvaluationStandard(standardId);
@@ -204,12 +204,12 @@ public class CourseController {
     @ApiOperation(value = "删除巡课指标",notes = "删除巡课指标列表中的一个")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardId",
-                    value = "巡课指标编号", required = true, defaultValue = "")
+                    value = "巡课指标编号", required = true)
     })
     public Map<String,Object> deleteTourStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("巡课指标编号") String standardId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             courseService.deleteTourStandard(standardId);
@@ -225,12 +225,12 @@ public class CourseController {
     @ApiOperation(value = "删除听课指标",notes = "删除听课指标列表中的一个")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardId",
-                    value = "听课指标编号", required = true, defaultValue = "")
+                    value = "听课指标编号", required = true)
     })
     public Map<String,Object> deleteListenStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("听课指标编号") String standardId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             courseService.deleteListenStandard(standardId);
@@ -246,16 +246,16 @@ public class CourseController {
     @ApiOperation(value = "添加评课指标",notes = "新增一个评课指标")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardType",
-                    value = "评课指标类型", required = true, defaultValue = ""),
+                    value = "评课指标类型", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardInclude",
-                    value = "评课指标内容", required = true, defaultValue = ""),
+                    value = "评课指标内容", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardWeight",
-                    value = "评课指标权重", required = true, defaultValue = "")
+                    value = "评课指标权重", required = true)
     })
     public Map<String,Object> addEvaluationStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardType") @ApiParam("评课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("评课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("评课指标权重") String standardWeight){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             List<ScoreStandard> scoreStandardList = courseService.getEvaluationStandardList();
@@ -278,16 +278,16 @@ public class CourseController {
     @ApiOperation(value = "添加巡课指标",notes = "新增一个巡课指标")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardType",
-                    value = "巡课指标类型", required = true, defaultValue = ""),
+                    value = "巡课指标类型", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardInclude",
-                    value = "巡课指标内容", required = true, defaultValue = ""),
+                    value = "巡课指标内容", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardWeight",
-                    value = "巡课指标权重", required = true, defaultValue = "")
+                    value = "巡课指标权重", required = true)
     })
     public Map<String,Object> addTourStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardType") @ApiParam("巡课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("巡课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("巡课指标权重") String standardWeight){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             List<ScoreStandard> scoreStandardList = courseService.getTourStandardList();
@@ -310,16 +310,16 @@ public class CourseController {
     @ApiOperation(value = "添加听课指标",notes = "新增一个听课指标")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardType",
-                    value = "听课指标类型", required = true, defaultValue = ""),
+                    value = "听课指标类型", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardInclude",
-                    value = "听课指标内容", required = true, defaultValue = ""),
+                    value = "听课指标内容", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardWeight",
-                    value = "听课指标权重", required = true, defaultValue = "")
+                    value = "听课指标权重", required = true)
     })
     public Map<String,Object> addListenStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardType") @ApiParam("听课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("听课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("听课指标权重") String standardWeight){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             List<ScoreStandard> scoreStandardList = courseService.getListenStandardList();
@@ -342,18 +342,18 @@ public class CourseController {
     @ApiOperation(value = "更新评课指标",notes = "更新评课指标的内容")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardId",
-                    value = "评课指标编号", required = true, defaultValue = ""),
+                    value = "评课指标编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardType",
-                    value = "评课指标类型", required = true, defaultValue = ""),
+                    value = "评课指标类型", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardInclude",
-                    value = "评课指标内容", required = true, defaultValue = ""),
+                    value = "评课指标内容", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardWeight",
-                    value = "评课指标权重", required = true, defaultValue = "")
+                    value = "评课指标权重", required = true)
     })
     public Map<String,Object> updateEvaluationStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("评课指标编号") String standardId,@RequestParam(value = "standardType") @ApiParam("评课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("评课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("评课指标权重") String standardWeight){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             ScoreStandard scoreStandard = new ScoreStandard();
@@ -374,18 +374,18 @@ public class CourseController {
     @ApiOperation(value = "更新巡课指标",notes = "更新巡课指标的内容")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardId",
-                    value = "巡课指标编号", required = true, defaultValue = ""),
+                    value = "巡课指标编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardType",
-                    value = "巡课指标类型", required = true, defaultValue = ""),
+                    value = "巡课指标类型", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardInclude",
-                    value = "巡课指标内容", required = true, defaultValue = ""),
+                    value = "巡课指标内容", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardWeight",
-                    value = "巡课指标权重", required = true, defaultValue = "")
+                    value = "巡课指标权重", required = true)
     })
     public Map<String,Object> updateTourStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("巡课指标编号") String standardId,@RequestParam(value = "standardType") @ApiParam("巡课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("巡课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("巡课指标权重") String standardWeight){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             ScoreStandard scoreStandard = new ScoreStandard();
@@ -406,18 +406,18 @@ public class CourseController {
     @ApiOperation(value = "更新听课指标",notes = "更新听课指标的内容")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardId",
-                    value = "听课指标编号", required = true, defaultValue = ""),
+                    value = "听课指标编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardType",
-                    value = "听课指标类型", required = true, defaultValue = ""),
+                    value = "听课指标类型", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardInclude",
-                    value = "听课指标内容", required = true, defaultValue = ""),
+                    value = "听课指标内容", required = true),
             @ApiImplicitParam(paramType = "query", name = "standardWeight",
-                    value = "听课指标权重", required = true, defaultValue = "")
+                    value = "听课指标权重", required = true)
     })
     public Map<String,Object> updateListenStandard(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "standardId") @ApiParam("听课指标编号") String standardId,@RequestParam(value = "standardType") @ApiParam("听课指标类型") String standardType,@RequestParam(value = "standardInclude") @ApiParam("听课指标内容") String standardInclude,@RequestParam(value = "standardWeight") @ApiParam("听课指标权重") String standardWeight){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             ScoreStandard scoreStandard = new ScoreStandard();
@@ -438,44 +438,44 @@ public class CourseController {
     @ApiOperation(value = "添加评课记录",notes = "评课信息的记录")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "q1",
-                    value = "问题1答案", required = true, defaultValue = ""),
+                    value = "问题1答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q2",
-                    value = "问题2答案", required = true, defaultValue = ""),
+                    value = "问题2答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q3",
-                    value = "问题3答案", required = true, defaultValue = ""),
+                    value = "问题3答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q4",
-                    value = "问题4答案", required = true, defaultValue = ""),
+                    value = "问题4答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q5",
-                    value = "问题5答案", required = true, defaultValue = ""),
+                    value = "问题5答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q6",
-                    value = "问题6答案", required = true, defaultValue = ""),
+                    value = "问题6答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q7",
-                    value = "问题7答案", required = true, defaultValue = ""),
+                    value = "问题7答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q8",
-                    value = "问题8答案", required = true, defaultValue = ""),
+                    value = "问题8答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q9",
-                    value = "问题9答案", required = true, defaultValue = ""),
+                    value = "问题9答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q10",
-                    value = "问题10答案", required = true, defaultValue = ""),
+                    value = "问题10答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q11",
-                    value = "问题11答案", required = true, defaultValue = ""),
+                    value = "问题11答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q12",
-                    value = "问题12答案", required = true, defaultValue = ""),
+                    value = "问题12答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q13",
-                    value = "问题13答案", required = true, defaultValue = ""),
+                    value = "问题13答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "advice",
-                    value = "评价及建议", required = true, defaultValue = ""),
+                    value = "评价及建议", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = ""),
+                    value = "课程子表编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "remark",
-                    value = "备注", required = true, defaultValue = "")
+                    value = "备注", required = true)
     })
     public Map<String,Object> addEvaluationCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "q1") @ApiParam("问题1答案") String q1,@RequestParam(value = "q2") @ApiParam("问题2答案") String q2,@RequestParam(value = "q3") @ApiParam("问题3答案") String q3,@RequestParam(value = "q4") @ApiParam("问题4答案") String q4,@RequestParam(value = "q5") @ApiParam("问题5答案") String q5,@RequestParam(value = "q6") @ApiParam("问题6答案") String q6,@RequestParam(value = "q7") @ApiParam("问题7答案") String q7,@RequestParam(value = "q8") @ApiParam("问题8答案") String q8,@RequestParam(value = "q9") @ApiParam("问题9答案") String q9,@RequestParam(value = "q10") @ApiParam("问题10答案") String q10,@RequestParam(value = "q11") @ApiParam("问题11答案") String q11,@RequestParam(value = "q12") @ApiParam("问题12答案") String q12,@RequestParam(value = "q13") @ApiParam("问题13答案") String q13,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -508,32 +508,32 @@ public class CourseController {
     @ApiOperation(value = "添加巡课记录",notes = "巡课信息的记录")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "q1",
-                    value = "问题1答案", required = true, defaultValue = ""),
+                    value = "问题1答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q2",
-                    value = "问题2答案", required = true, defaultValue = ""),
+                    value = "问题2答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q3",
-                    value = "问题3答案", required = true, defaultValue = ""),
+                    value = "问题3答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q4",
-                    value = "问题4答案", required = true, defaultValue = ""),
+                    value = "问题4答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "q5",
-                    value = "问题5答案", required = true, defaultValue = ""),
+                    value = "问题5答案", required = true),
             @ApiImplicitParam(paramType = "query", name = "attendance",
-                    value = "出勤率", required = true, defaultValue = ""),
+                    value = "出勤率", required = true),
             @ApiImplicitParam(paramType = "query", name = "riseRate",
-                    value = "抬头率", required = true, defaultValue = ""),
+                    value = "抬头率", required = true),
             @ApiImplicitParam(paramType = "query", name = "advice",
-                    value = "评价及建议", required = true, defaultValue = ""),
+                    value = "评价及建议", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = ""),
+                    value = "课程子表编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "remark",
-                    value = "备注", required = true, defaultValue = "")
+                    value = "备注", required = true)
     })
     public Map<String,Object> addTourCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "q1") @ApiParam("问题1答案") String q1,@RequestParam(value = "q2") @ApiParam("问题2答案") String q2,@RequestParam(value = "q3") @ApiParam("问题3答案") String q3,@RequestParam(value = "q4") @ApiParam("问题4答案") String q4,@RequestParam(value = "q5") @ApiParam("问题5答案") String q5,@RequestParam(value = "attendance") @ApiParam("出勤率") float attendance,@RequestParam(value = "riseRate") @ApiParam("抬头率") float riseRate,@RequestParam(value = "advice") @ApiParam("评价及建议") String advice,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "remark") @ApiParam("备注") String remark){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -566,12 +566,12 @@ public class CourseController {
     @ApiOperation(value = "获取学院课程",notes = "根据学院名称获取学院内课程")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = false, defaultValue = "")
+                    value = "角色编号")
     })
     public Map<String,Object> getInstituteCourse(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             return JsonUtil.success(courseService.getInstituteInfo(userName,roleId));
@@ -585,12 +585,12 @@ public class CourseController {
     @ApiOperation(value = "获取教师所授课程",notes = "根据教师名称获取教师所授课程信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = "")
+                    value = "角色编号", required = true)
     })
     public Map<String,Object> getTeacherCourse(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             return JsonUtil.success(courseService.getTeacherCourseInfo(userName,roleId));
@@ -604,18 +604,18 @@ public class CourseController {
     @ApiOperation(value = "搜索课程",notes = "根据关键字搜索相关课程")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "searchText",
-                    value = "关键字", required = true, defaultValue = ""),
+                    value = "关键字", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNo",
-                    value = "页码", required = true, defaultValue = ""),
+                    value = "页码", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNum",
-                    value = "页数据量", required = true, defaultValue = "")
+                    value = "页数据量", required = true)
     })
     public Map<String,Object> getCourseInfoWithText(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "searchText") @ApiParam("关键字") String searchText,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "pageNo") @ApiParam("页码") int pageNo,@RequestParam(value = "pageNum") @ApiParam("页数据量") int pageNum){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             dataMap.put("resList",courseService.getCourseInfoWithText(userName,searchText,roleId,pageNo,pageNum));
@@ -630,16 +630,16 @@ public class CourseController {
     @ApiOperation(value = "预约课程",notes = "预约功能对应的课程列表数据")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNo",
-                    value = "页码", required = true, defaultValue = ""),
+                    value = "页码", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNum",
-                    value = "页数据量", required = true, defaultValue = "")
+                    value = "页数据量", required = true)
     })
     public Map<String,Object> getNotStartCourse(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "pageNo") @ApiParam("页码") int pageNo,@RequestParam(value = "pageNum") @ApiParam("页数据量") int pageNum){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             return JsonUtil.success(courseService.getNotStartCourse(userName,roleId,pageNo,pageNum));
@@ -653,18 +653,18 @@ public class CourseController {
     @ApiOperation(value = "搜索预约课程",notes = "根据关键字搜索要预约的课程")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "searchText",
-                    value = "关键字", required = true, defaultValue = ""),
+                    value = "关键字", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNo",
-                    value = "页码", required = true, defaultValue = ""),
+                    value = "页码", required = true),
             @ApiImplicitParam(paramType = "query", name = "pageNum",
-                    value = "页数据量", required = true, defaultValue = "")
+                    value = "页数据量", required = true)
     })
     public Map<String,Object> searchNotStartCourse(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "searchText") @ApiParam("关键字") String searchText,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "pageNo") @ApiParam("页码") int pageNo,@RequestParam(value = "pageNum") @ApiParam("页数据量") int pageNum){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             dataMap.put("resList",courseService.searchNotStartCourse(userName,searchText,roleId,pageNo,pageNum));
@@ -677,16 +677,16 @@ public class CourseController {
     @GetMapping("/getTeacherRadar")
     @CrossOrigin
     public Map<String,Object> getTeacherRadar(){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
-        List<Object> dataList = new ArrayList<Object>();
+        Map<String,Object> dataMap = new HashMap<>();
+        List<Object> dataList = new ArrayList<>();
         String[] typeList = new String[]{"睡觉", "吃东西", "玩手机", "站立", "书写", "看黑板","举手"};
         dataMap.put("categories",typeList);
-        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        Map<String,Object> infoMap1 = new HashMap<>();
         int[] numList1 = new int[]{8,3,18,2,17,45,1};
         infoMap1.put("name","课程");
         infoMap1.put("data",numList1);
         dataList.add(infoMap1);
-        Map<String,Object> infoMap2 = new HashMap<String,Object>();
+        Map<String,Object> infoMap2 = new HashMap<>();
         int[] numList2 = new int[]{5,2,11,2,22,43,1};
         infoMap2.put("name","平均");
         infoMap2.put("data",numList2);
@@ -698,16 +698,16 @@ public class CourseController {
     @GetMapping("/getTeacherBar")
     @CrossOrigin
     public Map<String,Object> getTeacherBar(){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
-        List<Object> dataList = new ArrayList<Object>();
+        Map<String,Object> dataMap = new HashMap<>();
+        List<Object> dataList = new ArrayList<>();
         String[] typeList = new String[]{"09-12", "09-13", "09-14", "09-15", "09-16", "09-19","09-20"};
         dataMap.put("categories",typeList);
-        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        Map<String,Object> infoMap1 = new HashMap<>();
         int[] numList1 = new int[]{98,96,98,94,95,98,92};
         infoMap1.put("name","课程");
         infoMap1.put("data",numList1);
         dataList.add(infoMap1);
-        Map<String,Object> infoMap2 = new HashMap<String,Object>();
+        Map<String,Object> infoMap2 = new HashMap<>();
         int[] numList2 = new int[]{99,97,96,98,98,99,96};
         infoMap2.put("name","平均");
         infoMap2.put("data",numList2);
@@ -719,11 +719,11 @@ public class CourseController {
     @GetMapping("/getCourseRadar")
     @CrossOrigin
     public Map<String,Object> getCourseRadar(){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
-        List<Object> dataList = new ArrayList<Object>();
+        Map<String,Object> dataMap = new HashMap<>();
+        List<Object> dataList = new ArrayList<>();
         String[] typeList = new String[]{"计算机思维导论(C语言)", "数据结构与算法", "人工智能导论", "数值计算", "计算机网络基础", "数据分析与可视化","大数据技术导论"};
         dataMap.put("categories",typeList);
-        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        Map<String,Object> infoMap1 = new HashMap<>();
         int[] numList1 = new int[]{90,93,88,92,87,81,91};
         infoMap1.put("name","得分");
         infoMap1.put("data",numList1);
@@ -735,21 +735,21 @@ public class CourseController {
     @GetMapping("/getCourseLine")
     @CrossOrigin
     public Map<String,Object> getCourseLine(){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
-        List<Object> dataList = new ArrayList<Object>();
+        Map<String,Object> dataMap = new HashMap<>();
+        List<Object> dataList = new ArrayList<>();
         String[] typeList = new String[]{"09-12", "09-13", "09-14", "09-15", "09-16", "09-19","09-20"};
         dataMap.put("categories",typeList);
-        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        Map<String,Object> infoMap1 = new HashMap<>();
         int[] numList1 = new int[]{95,92,96,91,97,93,96};
         infoMap1.put("name","计科2104班");
         infoMap1.put("data",numList1);
         dataList.add(infoMap1);
-        Map<String,Object> infoMap2 = new HashMap<String,Object>();
+        Map<String,Object> infoMap2 = new HashMap<>();
         int[] numList2 = new int[]{94,91,90,93,92,95,96};
         infoMap2.put("name","大数据2101班");
         infoMap2.put("data",numList2);
         dataList.add(infoMap2);
-        Map<String,Object> infoMap3 = new HashMap<String,Object>();
+        Map<String,Object> infoMap3 = new HashMap<>();
         int[] numList3 = new int[]{88,85,81,82,87,91,94};
         infoMap3.put("name","人工智能2102班");
         infoMap3.put("data",numList3);
@@ -761,11 +761,11 @@ public class CourseController {
     @GetMapping("/getCourseBar")
     @CrossOrigin
     public Map<String,Object> getCourseBar(){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
-        List<Object> dataList = new ArrayList<Object>();
+        Map<String,Object> dataMap = new HashMap<>();
+        List<Object> dataList = new ArrayList<>();
         String[] typeList = new String[]{"09-12", "09-13", "09-14", "09-15", "09-16", "09-19","09-20"};
         dataMap.put("categories",typeList);
-        Map<String,Object> infoMap1 = new HashMap<String,Object>();
+        Map<String,Object> infoMap1 = new HashMap<>();
         int[] numList1 = new int[]{90,93,91,92,97,91,94};
         infoMap1.put("name","出勤率");
         infoMap1.put("data",numList1);
@@ -779,12 +779,12 @@ public class CourseController {
     @ApiOperation(value = "获取记录",notes = "根据角色获取相应的评价记录")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = "")
+                    value = "角色编号", required = true)
     })
     public Map<String,Object> getRecord(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             return JsonUtil.success(courseService.getRecord(userName,roleId));
@@ -798,14 +798,14 @@ public class CourseController {
     @ApiOperation(value = "获取角色听课信息",notes = "根据角色获取相应的听课记录")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = "")
+                    value = "课程子表编号", required = true)
     })
     public Map<String,Object> getListenCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             ListenCourse listenCourse = new ListenCourse();
@@ -824,14 +824,14 @@ public class CourseController {
     @ApiOperation(value = "获取角色评课信息",notes = "根据角色获取相应的评课记录")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = "")
+                    value = "课程子表编号", required = true)
     })
     public Map<String,Object> getEvaluationCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             EvaluationCourse evaluationCourse = new EvaluationCourse();
@@ -850,14 +850,14 @@ public class CourseController {
     @ApiOperation(value = "获取角色巡课信息",notes = "根据角色获取相应的巡课记录")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = "")
+                    value = "课程子表编号", required = true)
     })
     public Map<String,Object> getTourCourseInfo(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             TourCourse tourCourse = new TourCourse();
@@ -878,7 +878,7 @@ public class CourseController {
     @PostMapping("/upLoadInvoiceImg")
     @ResponseBody
     public Map<String,Object> upLoadAgeImg(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "file") @ApiParam("课堂照片") MultipartFile file[]) {
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if(JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             try {
@@ -921,12 +921,12 @@ public class CourseController {
     @ApiOperation(value = "删除图片",notes = "删除图片")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "imgUrl",
-                    value = "图片链接", required = true, defaultValue = "")
+                    value = "图片链接", required = true)
     })
     public Map<String,Object> deleteClassroomImg(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "imgUrl") @ApiParam("图片链接") String imgUrl){
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             courseService.deleteClassroomImg(imgUrl);

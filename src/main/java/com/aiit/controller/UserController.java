@@ -45,9 +45,9 @@ public class UserController {
     @ApiOperation(value = "获取用户信息",notes = "确保用户名和密码正确，会返回该用户的全部信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "userName",
-                    value = "用户名", required = true, defaultValue = ""),
+                    value = "用户名", required = true),
             @ApiImplicitParam(paramType = "query", name = "password",
-                    value = "密码", required = true, defaultValue = "")
+                    value = "密码", required = true)
     })
     public Map<String,Object> getUserInfo(@RequestParam(name = "userName") @ApiParam("用户名") String userName, @RequestParam(name = "password") @ApiParam("密码") String password){
         Map<String,Object> dataMap = userService.getUserInfo(userName,password);
@@ -61,7 +61,7 @@ public class UserController {
     @PostMapping("/upLoadUserImg")
     @ResponseBody
     public Map<String,Object> upLoadAgeImg(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "file") @ApiParam("课堂照片") MultipartFile file[]) {
-        Map<String,Object> dataMap = new HashMap<String,Object>();
+        Map<String,Object> dataMap = new HashMap<>();
         if(JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             try {
@@ -131,10 +131,10 @@ public class UserController {
     @ApiOperation(value = "获取openid",notes = "确保js_code正确")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "js_code",
-                    value = "获取openid必须参", required = true, defaultValue = "")
+                    value = "获取openid必须参", required = true)
     })
-    public HashMap<String,Object> code2Session(@RequestParam(value = "js_code",required = true) @ApiParam("获取openid必须参") String js_code){
-        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+    public HashMap<String,Object> code2Session(@RequestParam(value = "js_code") @ApiParam("获取openid必须参") String js_code){
+        HashMap<String,Object> dataMap = new HashMap<>();
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid=wxd6a69cf9d408a010&secret=2ace9c7abb9119357fb54b2cc60d4c91&js_code="+js_code+"&grant_type=authorization_code";
         // 请求头设置,x-www-form-urlencoded格式的数据
         HttpHeaders headers = new HttpHeaders();
@@ -148,12 +148,12 @@ public class UserController {
 //        map.add("grant_type", "authorization_code");
 
         // 组装请求体
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         RestTemplate restTemplate = new RestTemplate();
         // 发送post请求，并打印结果，以String类型接收响应结果JSON字符串
         String result = restTemplate.postForObject(url, request, String.class);
         log.info(result);
-        HashMap<String,Object> resultMap = new HashMap<String,Object>();
+        HashMap<String,Object> resultMap = new HashMap<>();
         JSONObject dataInfo = JSON.parseObject(result);
         String session_key = dataInfo.getString("session_key");
         String openid = dataInfo.getString("openid");
@@ -170,16 +170,16 @@ public class UserController {
     @ApiOperation(value = "订阅消息",notes = "订阅消息->消息推送")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "touser",
-                    value = "openid", required = true, defaultValue = ""),
+                    value = "openid", required = true),
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = ""),
+                    value = "课程子表编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = "")
+                    value = "角色编号", required = true)
     })
     public HashMap<String,Object> addSubscription(@RequestParam(value = "touser") @ApiParam("openid") String touser,@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId){
-        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+        HashMap<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             Subscription subscription = new Subscription();
@@ -216,14 +216,14 @@ public class UserController {
     @ApiOperation(value = "取消订阅",notes = "取消订阅")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = ""),
+                    value = "token", required = true),
             @ApiImplicitParam(paramType = "query", name = "courseSlaveId",
-                    value = "课程子表编号", required = true, defaultValue = "")
+                    value = "课程子表编号", required = true)
     })
     public HashMap<String,Object> deleteSubscription(@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId){
-        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+        HashMap<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             userService.deleteSubscription(new RoleSubscription(roleId,userName,courseSlaveId));
@@ -240,12 +240,12 @@ public class UserController {
     @ApiOperation(value = "获取订阅列表",notes = "获取订阅列表")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = "")
+                    value = "token", required = true)
     })
     public HashMap<String,Object> getSubscriptionList(@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "token") @ApiParam("token") String token){
-        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+        HashMap<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             dataMap.put("dataList",userService.getSubscriptionWithRole(new UserSubscription(userName,roleId)));
@@ -262,12 +262,12 @@ public class UserController {
     @ApiOperation(value = "获取角色任务",notes = "获取角色的任务信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "roleId",
-                    value = "角色编号", required = true, defaultValue = ""),
+                    value = "角色编号", required = true),
             @ApiImplicitParam(paramType = "query", name = "token",
-                    value = "token", required = true, defaultValue = "")
+                    value = "token", required = true)
     })
     public HashMap<String,Object> roleTaskInfo(@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "token") @ApiParam("token") String token){
-        HashMap<String,Object> dataMap = new HashMap<String,Object>();
+        HashMap<String,Object> dataMap = new HashMap<>();
         if (JwtUtil.verify(token) != null){
             String userName = JwtUtil.verify(token);
             String taskDescribe = "";
