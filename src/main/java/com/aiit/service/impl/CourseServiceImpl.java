@@ -84,7 +84,7 @@ public class CourseServiceImpl implements CourseService {
                 List<ListenCourse> courseList = courseMapper.getRoleSubscriptionListenCourse(new UserSubscription(userName,roleId));
                 for (int j = 0;j<courseList.size();j++){
                     if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
-                        ci.setSubscription(true);
+                        ci.setEvaluation(true);
                     }
                 }
                 resList.add(ci);
@@ -120,7 +120,7 @@ public class CourseServiceImpl implements CourseService {
                 List<TourCourse> courseList = courseMapper.getRoleSubscriptionTourCourse(new UserSubscription(userName,roleId));
                 for (int j = 0;j<courseList.size();j++){
                     if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
-                        ci.setSubscription(true);
+                        ci.setEvaluation(true);
                     }
                 }
                 resList.add(ci);
@@ -160,7 +160,7 @@ public class CourseServiceImpl implements CourseService {
                 List<TourCourse> courseList = courseMapper.getRoleSubscriptionTourCourse(new UserSubscription(userName,roleId));
                 for (int j = 0;j<courseList.size();j++){
                     if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
-                        ci.setSubscription(true);
+                        ci.setEvaluation(true);
                     }
                 }
                 resList.add(ci);
@@ -196,7 +196,7 @@ public class CourseServiceImpl implements CourseService {
                 List<EvaluationCourse> courseList = courseMapper.getRoleSubscriptionEvaluationCourse(new UserSubscription(userName,roleId));
                 for (int j = 0;j<courseList.size();j++){
                     if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
-                        ci.setSubscription(true);
+                        ci.setEvaluation(true);
                     }
                 }
                 resList.add(ci);
@@ -237,7 +237,7 @@ public class CourseServiceImpl implements CourseService {
                 List<EvaluationCourse> courseList = courseMapper.getRoleSubscriptionEvaluationCourse(new UserSubscription(userName,roleId));
                 for (int j = 0;j<courseList.size();j++){
                     if (courseList.get(j).getCourseSlaveId().equals(ci.getCourseSlaveId())){
-                        ci.setSubscription(true);
+                        ci.setEvaluation(true);
                     }
                 }
                 resList.add(ci);
@@ -299,7 +299,7 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.getTourStandard();
     }
     public void addListenCourseInfo(ListenCourse listenCourse,Task task){
-//        courseMapper.addListenCourseInfo(listenCourse);
+        courseMapper.addListenCourseInfo(listenCourse);
         userMapper.solveOnceTask(task);
     }
     public void deleteEvaluationStandard(String standardId){
@@ -1203,5 +1203,11 @@ public class CourseServiceImpl implements CourseService {
     }
     public EvaluationCourse getEvaluationCourseInfo(EvaluationCourse evaluationCourse){
         return courseMapper.getEvaluationCourseInfo(evaluationCourse);
+    }
+    public void uploadClassroomImg(TourCourseImg tourCourse){
+        courseMapper.uploadClassroomImg(tourCourse);
+    }
+    public void deleteClassroomImg(String imgUrl){
+        courseMapper.deleteClassroomImg(imgUrl);
     }
 }

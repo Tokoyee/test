@@ -48,7 +48,7 @@ public interface CourseMapper {
     @Insert("insert into evaluation_course(`q1`,`q2`,`q3`,`q4`,`q5`,`q6`,`q7`,`q8`,`q9`,`q10`,`q11`,`q12`,`q13`,`advice`,`courseSlaveId`,`userName`,`dateTime`,`roleId`,`remark`) values(#{q1},#{q2},#{q3},#{q4},#{q5},#{q6},#{q7},#{q8},#{q9},#{q10},#{q11},#{q12},#{q13},#{advice},#{courseSlaveId},#{userName},#{dateTime},#{roleId},#{remark})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addEvaluationCourseInfo(EvaluationCourse evaluationCourse);
-    @Insert("insert into tour_course(`q1`,`q2`,`q3`,`q4`,`q5`,`attendance`,`riseRate`,`advice`,`courseSlaveId`,`userName`,`dateTime`,`roleId`,`remark`) values(#{q1},#{q2},#{q3},#{q4},#{q5},#{attendance},#{riseRate},#{advice},#{courseSlaveId},#{userName},#{dateTime},#{roleId},#{remark})")
+    @Insert("insert into tour_course(`q1`,`q2`,`q3`,`q4`,`q5`,`attendance`,`riseRate`,`advice`,`courseSlaveId`,`userName`,`dateTime`,`roleId`,`remark`,`imgUrl`) values(#{q1},#{q2},#{q3},#{q4},#{q5},#{attendance},#{riseRate},#{advice},#{courseSlaveId},#{userName},#{dateTime},#{roleId},#{remark},#{imgUrl})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public void addTourCourseInfo(TourCourse tourCourse);
     @Select("SELECT cs.week,cs.weeks,cs.periodTime,cs.time,dw.date,cm.courseName,cm.classroomId,u.trueName,u.instituteName FROM course_slave cs,date_week dw,course_master cm,user u WHERE date = '2022-11-01' AND time = '08:30-10:05' AND cs.week = dw.week AND cs.weeks = dw.weeks AND cs.courseMasterId = cm.courseMasterId AND cm.userId = u.userId AND (cm.courseName LIKE concat('%',#{searchText},'%') or u.trueName LIKE concat('%',#{searchText},'%') or u.instituteName LIKE concat('%',#{searchText},'%'))")
@@ -85,4 +85,9 @@ public interface CourseMapper {
     public List<ListenCourse> getRoleSubscriptionListenCourse(UserSubscription userSubscription);
     @Select("SELECT * FROM tour_course WHERE userName = #{userName} AND roleId = #{roleId} order by dateTime")
     public List<TourCourse> getRoleSubscriptionTourCourse(UserSubscription userSubscription);
+    @Insert("insert into tour_course_img(`courseSlaveId`,`userName`,`roleId`,`imgUrl`) values(#{courseSlaveId},#{userName},#{roleId},#{imgUrl})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    public void uploadClassroomImg(TourCourseImg tourCourseImg);
+    @Delete("delete from tour_course_img WHERE imgUrl = #{imgUrl}")
+    public void deleteClassroomImg(String imgUrl);
 }

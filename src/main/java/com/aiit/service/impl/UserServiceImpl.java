@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
                     }
                     trueName = user.getTrueName();
                     String img = user.getImgUrl();
-                    userImg = "http://aiitbeidou.cn:8080/userImg/"+img;
+                    userImg = img;
                     token = JwtUtil.sign(user);
                     phoneNumber = user.getPhoneNumber();
                     userId = user.getUserId();
@@ -104,8 +104,8 @@ public class UserServiceImpl implements UserService {
     /*
     更新用户头像
      */
-    public void updateImgName(User user){
-        userMapper.updateImgName(user);
+    public void updateUserImg(User user){
+        userMapper.updateImgUrl(user);
     }
     /*
     添加用户

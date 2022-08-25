@@ -56,6 +56,11 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 150MB
+      max-file-size: 150MB
 #  resources:
 #    add-mappings: true        # 静态资源默认配置规则是否开启,false表示禁用
 #    cache:

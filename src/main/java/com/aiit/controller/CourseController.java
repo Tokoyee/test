@@ -25,22 +25,6 @@ public class CourseController {
     @Autowired
     CourseService courseService;
     /*
-    获取教室信息
-     */
-//    @GetMapping("/getClassroomInfo")
-//    @CrossOrigin
-//    @ApiOperation(value = "获取智慧教室信息",notes = "返回该教室的信息")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(paramType = "query", name = "classRoomName",
-//                    value = "教室名称", required = false, defaultValue = "")
-//    })
-//    public Map<String,Object> getClassroomInfo(@RequestParam(value = "searchText",required = false,defaultValue = "") @ApiParam("搜索文本") String searchText){
-//        if (searchText.equals("")){
-//            return classSevice.getAllClassroomInfo();
-//        }
-//        return classSevice.getOneClassroomInfo(searchText);
-//    }
-    /*
     提供各学院的老师名称数据
      */
     @ApiOperation(value = "获取老师列表",notes = "获取各学院的老师列表")
@@ -881,6 +865,72 @@ public class CourseController {
             tourCourse.setRoleId(roleId);
             tourCourse.setCourseSlaveId(courseSlaveId);
             dataMap.put("result",courseService.getTourCourseInfo(tourCourse));
+            return JsonUtil.success(dataMap);
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+    }
+    @Value("/www/server/tomcat/webapps/classroomImg/")
+//    @Value("E:\\QQ音乐\\")
+    public String upLoadInvoiceImg;
+    @CrossOrigin
+    @ApiOperation(value = "上传巡课照片",notes = "巡课时抓拍的课堂照片")
+    @PostMapping("/upLoadInvoiceImg")
+    @ResponseBody
+    public Map<String,Object> upLoadAgeImg(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "roleId") @ApiParam("角色编号") String roleId,@RequestParam(value = "courseSlaveId") @ApiParam("课程子表编号") String courseSlaveId,@RequestParam(value = "file") @ApiParam("课堂照片") MultipartFile file[]) {
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if(JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            try {
+                for (int i = 0; i < file.length; i++) {
+                    if (file[i] != null){
+                        String fileName = System.currentTimeMillis()+file[i].getOriginalFilename();
+                        String upload_file_dir = upLoadInvoiceImg;
+                        String destFileName = upLoadInvoiceImg + fileName;
+                        File upload_file_dir_file = new File(upload_file_dir);
+                        if (!upload_file_dir_file.exists()){
+                            upload_file_dir_file.mkdirs();
+                        }
+                        File targetFile = new File(upload_file_dir_file,fileName);
+                        file[i].transferTo(targetFile);
+                        System.out.println("上传了："+destFileName);
+                        dataMap.put("resp",fileName);
+                        TourCourseImg tourCourse = new TourCourseImg();
+                        String serverImgUrl = "http://aiitbeidou.cn:8080/classroomImg/"+ fileName;
+                        tourCourse.setImgUrl(serverImgUrl);
+                        tourCourse.setUserName(userName);
+                        tourCourse.setRoleId(roleId);
+                        tourCourse.setCourseSlaveId(courseSlaveId);
+                        courseService.uploadClassroomImg(tourCourse);
+                        dataMap.put("imgUrl",serverImgUrl);
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }else {
+            return JsonUtil.token_error(dataMap);
+        }
+        dataMap.put("result","上传成功");
+
+        return JsonUtil.success(dataMap);
+    }
+    @GetMapping("/deleteClassroomImg")
+    @Cacheable("deleteClassroomImg")
+    @CrossOrigin
+    @ApiOperation(value = "删除图片",notes = "删除图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "token",
+                    value = "token", required = true, defaultValue = ""),
+            @ApiImplicitParam(paramType = "query", name = "imgUrl",
+                    value = "图片链接", required = true, defaultValue = "")
+    })
+    public Map<String,Object> deleteClassroomImg(@RequestParam(value = "token") @ApiParam("token") String token,@RequestParam(value = "imgUrl") @ApiParam("图片链接") String imgUrl){
+        Map<String,Object> dataMap = new HashMap<String,Object>();
+        if (JwtUtil.verify(token) != null){
+            String userName = JwtUtil.verify(token);
+            courseService.deleteClassroomImg(imgUrl);
+            dataMap.put("result","删除成功");
             return JsonUtil.success(dataMap);
         }else {
             return JsonUtil.token_error(dataMap);

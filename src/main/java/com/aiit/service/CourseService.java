@@ -34,5 +34,6 @@ public interface CourseService {
     public ListenCourse getListenCourseInfo(ListenCourse listenCourse);
     public TourCourse getTourCourseInfo(TourCourse tourCourse);
     public EvaluationCourse getEvaluationCourseInfo(EvaluationCourse evaluationCourse);
-
+    public void uploadClassroomImg(TourCourseImg tourCourse);
+    public void deleteClassroomImg(String imgUrl);
 }
